@@ -2,11 +2,13 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'net.minecraftforge.gradle' version '[6.0,8.12)'
 }
+
 
 version = mod_version
 group = mod_group_id
+
 
 base {
     archivesName = mod_id
@@ -86,6 +88,8 @@ minecraft {
 
         client {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             property 'forge.enabledGameTestNamespaces', mod_id
         }
 
@@ -123,10 +127,23 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+
+
+    // maven {
+    //     name = "ModMaven"
+    //     url = "https://modmaven.dev"
+    // }
 }
+
 
 dependencies {
     // Specify the version of Minecraft to use.
+
     // Any artifact can be supplied so long as it has a "userdev" classifier artifact and is a compatible patcher artifact.
     // The "userdev" classifier will be requested and setup by ForgeGradle.
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
@@ -139,9 +156,14 @@ dependencies {
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
     // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
 
+    // Updated EMI dependency
+	compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}:api")
+	runtimeOnly fg.deobf("dev.emi:emi-forge:${emi_version}")
+
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"
+
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
 
     // For more info:
@@ -152,6 +174,8 @@ dependencies {
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
+
+
 // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
@@ -190,6 +214,10 @@ tasks.named('jar', Jar).configure {
 // tasks.named('publish').configure {
 //     dependsOn 'reobfJar'
 // }
+
+task genWrapper(type: Wrapper) {
+   gradleVersion = '8.12' //version required
+}
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
