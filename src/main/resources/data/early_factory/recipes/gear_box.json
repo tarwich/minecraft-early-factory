@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["PGP", "GFG", "PGP"],
+  "key": {
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "G": {
+      "item": "early_factory:gear"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    }
+  },
+  "result": {
+    "item": "early_factory:gear_box",
+    "count": 1
+  }
+}
