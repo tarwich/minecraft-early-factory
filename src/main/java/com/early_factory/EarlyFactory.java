@@ -3,6 +3,8 @@ package com.early_factory;
 import org.slf4j.Logger;
 
 import com.early_factory.block.BreakerBlock;
+import com.early_factory.block.entity.ModBlockEntities;
+import com.early_factory.menu.ModMenuTypes;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.Minecraft;
@@ -87,6 +89,9 @@ public class EarlyFactory {
         // Register our mod's ForgeConfigSpec so that Forge can create and load the
         // config file for us
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+        ModMenuTypes.MENUS.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
