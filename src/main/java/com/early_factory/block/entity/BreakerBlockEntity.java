@@ -1,5 +1,8 @@
 package com.early_factory.block.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.early_factory.block.BreakerBlock;
 import com.early_factory.menu.BreakerMenu;
 
@@ -85,6 +88,55 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
     return new BreakerMenu(id, inventory, this);
   }
 
+  private void breakBlock(Level level, BlockPos pos, FakePlayer fakePlayer, ItemStack tool) {
+    BlockState state = level.getBlockState(pos);
+
+    // Break the block
+    level.destroyBlock(pos, true, fakePlayer);
+
+    // Damage the tool
+    tool.hurtAndBreak(1, fakePlayer, (player) -> {
+    });
+  }
+
+  private void breakTreeRecursively(Level level, BlockPos startPos, FakePlayer fakePlayer, ItemStack tool,
+      Set<BlockPos> visited) {
+    if (visited.size() > 1000 || !visited.add(startPos)) { // Safety limit and cycle detection
+      return;
+    }
+
+    BlockState state = level.getBlockState(startPos);
+    boolean isLog = state.is(net.minecraft.tags.BlockTags.LOGS);
+    boolean isLeaves = state.is(net.minecraft.tags.BlockTags.LEAVES);
+
+    // Only continue if it's part of a tree
+    if (!isLog && !isLeaves) {
+      return;
+    }
+
+    breakBlock(level, startPos, fakePlayer, tool);
+
+    // For logs, check all directions. For leaves, only check adjacent blocks
+    int range = isLog ? 1 : 1;
+
+    // Check surrounding blocks
+    for (int x = -range; x <= range; x++) {
+      for (int y = -range; y <= range; y++) {
+        for (int z = -range; z <= range; z++) {
+          if (x == 0 && y == 0 && z == 0)
+            continue;
+
+          BlockPos newPos = startPos.offset(x, y, z);
+          BlockState newState = level.getBlockState(newPos);
+
+          if (newState.is(net.minecraft.tags.BlockTags.LOGS) || newState.is(net.minecraft.tags.BlockTags.LEAVES)) {
+            breakTreeRecursively(level, newPos, fakePlayer, tool, visited);
+          }
+        }
+      }
+    }
+  }
+
   public void tick(Level level, BlockPos pos, BlockState state) {
     if (level.isClientSide()) {
       return;
@@ -118,12 +170,13 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
         // Start breaking the block
         targetState.attack(level, targetPos, fakePlayer);
 
-        // Actually break the block
-        level.destroyBlock(targetPos, true, fakePlayer);
-
-        // Damage the tool
-        tool.hurtAndBreak(1, fakePlayer, (player) -> {
-        });
+        // If it's a log, break the whole tree
+        if (targetState.is(net.minecraft.tags.BlockTags.LOGS)) {
+          breakTreeRecursively(level, targetPos, fakePlayer, tool, new HashSet<>());
+        } else {
+          // Just break the single block
+          breakBlock(level, targetPos, fakePlayer, tool);
+        }
 
         // Update the inventory with the potentially damaged tool
         itemHandler.setStackInSlot(0, tool);
