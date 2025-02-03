@@ -1,6 +1,7 @@
 package com.early_factory.block;
 
 import com.early_factory.block.entity.BreakerBlockEntity;
+import com.early_factory.block.entity.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +15,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -64,5 +67,18 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
       }
     }
     return InteractionResult.sidedSuccess(level.isClientSide());
+  }
+
+  @Override
+  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+      BlockEntityType<T> blockEntityType) {
+    return level.isClientSide ? null
+        : createTickerHelper(blockEntityType, ModBlockEntities.BREAKER.get(),
+            (level1, pos, state1, blockEntity) -> ((BreakerBlockEntity) blockEntity).tick(level1, pos, state1));
+  }
+
+  private static <T extends BlockEntity> BlockEntityTicker<T> createTickerHelper(BlockEntityType<T> actualType,
+      BlockEntityType<?> expectedType, BlockEntityTicker<? super BlockEntity> ticker) {
+    return expectedType == actualType ? (BlockEntityTicker<T>) ticker : null;
   }
 }
