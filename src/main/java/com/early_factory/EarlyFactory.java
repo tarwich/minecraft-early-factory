@@ -3,11 +3,13 @@ package com.early_factory;
 import org.slf4j.Logger;
 
 import com.early_factory.block.BreakerBlock;
+import com.early_factory.block.PlacerBlock;
 import com.early_factory.block.entity.ModBlockEntities;
 import com.early_factory.menu.ModMenuTypes;
+import com.early_factory.screen.PlacerScreen;
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -68,6 +70,10 @@ public class EarlyFactory {
 
     public static final RegistryObject<Item> BREAKER_ITEM = ITEMS.register("breaker",
             () -> new BlockItem(BREAKER.get(), new Item.Properties()));
+
+    public static final RegistryObject<Block> PLACER = BLOCKS.register("placer", PlacerBlock::new);
+    public static final RegistryObject<Item> PLACER_ITEM = ITEMS.register("placer",
+            () -> new BlockItem(PLACER.get(), new Item.Properties()));
 
     public EarlyFactory() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -131,9 +137,9 @@ public class EarlyFactory {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+            event.enqueueWork(() -> {
+                MenuScreens.register(ModMenuTypes.PLACER.get(), PlacerScreen::new);
+            });
         }
     }
 }

@@ -29,7 +29,7 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
   public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 
   public BreakerBlock() {
-    super(BlockBehaviour.Properties.of(Material.METAL)
+    super(BlockBehaviour.Properties.of(Material.WOOD)
         .strength(3.5f)
         .requiresCorrectToolForDrops());
 

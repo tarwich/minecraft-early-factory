@@ -14,4 +14,7 @@ public class ModMenuTypes {
 
   public static final RegistryObject<MenuType<BreakerMenu>> BREAKER_MENU = MENUS.register("breaker_menu",
       () -> IForgeMenuType.create(BreakerMenu::new));
+
+  public static final RegistryObject<MenuType<PlacerMenu>> PLACER = MENUS.register("placer",
+          () -> IForgeMenuType.create(PlacerMenu::new));
 }

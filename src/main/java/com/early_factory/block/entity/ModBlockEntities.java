@@ -14,4 +14,8 @@ public class ModBlockEntities {
     public static final RegistryObject<BlockEntityType<BreakerBlockEntity>> BREAKER = BLOCK_ENTITIES.register("breaker",
             () -> BlockEntityType.Builder.of(BreakerBlockEntity::new,
                     EarlyFactory.BREAKER.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<PlacerBlockEntity>> PLACER = BLOCK_ENTITIES.register("placer",
+            () -> BlockEntityType.Builder.of(PlacerBlockEntity::new,
+                    EarlyFactory.PLACER.get()).build(null));
 }
