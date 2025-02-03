@@ -97,6 +97,12 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
 
     Direction facing = state.getValue(BreakerBlock.FACING);
     BlockPos targetPos = pos.relative(facing);
+    BlockState targetState = level.getBlockState(targetPos);
+
+    // Skip if target is air or a growing plant
+    if (targetState.isAir() || isGrowingPlant(targetState)) {
+      return;
+    }
 
     ItemStack tool = itemHandler.getStackInSlot(0);
     if (!tool.isEmpty()) {
@@ -107,31 +113,58 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
       BlockPos playerPos = pos.relative(facing.getOpposite());
       fakePlayer.setPos(playerPos.getX() + 0.5, playerPos.getY() + 0.5, playerPos.getZ() + 0.5);
 
-      // Get the target block state
-      BlockState targetState = level.getBlockState(targetPos);
-      if (!targetState.isAir()) {
-        // Try to break the block if it's a tool
-        if (tool.getItem() instanceof DiggerItem) {
-          // Start breaking the block
-          targetState.attack(level, targetPos, fakePlayer);
+      // Try to break the block if it's a tool
+      if (tool.getItem() instanceof DiggerItem) {
+        // Start breaking the block
+        targetState.attack(level, targetPos, fakePlayer);
 
-          // Actually break the block
-          level.destroyBlock(targetPos, true, fakePlayer);
+        // Actually break the block
+        level.destroyBlock(targetPos, true, fakePlayer);
 
-          // Damage the tool
-          tool.hurtAndBreak(1, fakePlayer, (player) -> {
-          });
+        // Damage the tool
+        tool.hurtAndBreak(1, fakePlayer, (player) -> {
+        });
 
-          // Update the inventory with the potentially damaged tool
-          itemHandler.setStackInSlot(0, tool);
-        } else {
-          // For non-tools, try to use the item normally
-          Vec3 targetVec = new Vec3(targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5);
-          BlockHitResult hitResult = new BlockHitResult(targetVec, facing.getOpposite(), targetPos, false);
-          tool.useOn(new UseOnContext(fakePlayer, InteractionHand.MAIN_HAND, hitResult));
-          itemHandler.setStackInSlot(0, fakePlayer.getItemInHand(InteractionHand.MAIN_HAND));
-        }
+        // Update the inventory with the potentially damaged tool
+        itemHandler.setStackInSlot(0, tool);
+      } else {
+        // For non-tools, try to use the item normally
+        Vec3 targetVec = new Vec3(targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5);
+        BlockHitResult hitResult = new BlockHitResult(targetVec, facing.getOpposite(), targetPos, false);
+        tool.useOn(new UseOnContext(fakePlayer, InteractionHand.MAIN_HAND, hitResult));
+        itemHandler.setStackInSlot(0, fakePlayer.getItemInHand(InteractionHand.MAIN_HAND));
       }
     }
+  }
+
+  private boolean isGrowingPlant(BlockState state) {
+    // Check if the block is a sapling
+    if (state.getBlock() instanceof net.minecraft.world.level.block.SaplingBlock) {
+      return true;
+    }
+
+    // Check for crops and other growing plants
+    if (state.getBlock() instanceof net.minecraft.world.level.block.CropBlock crop) {
+      return !crop.isMaxAge(state);
+    }
+
+    // Check for sweet berry bush
+    if (state.getBlock() instanceof net.minecraft.world.level.block.SweetBerryBushBlock bush) {
+      return state.getValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE) < 3;
+    }
+
+    // Check for bamboo
+    if (state.getBlock() instanceof net.minecraft.world.level.block.BambooSaplingBlock) {
+      return true;
+    }
+
+    // Check for cactus and sugar cane (optional - they can be broken at any stage)
+    // if (state.getBlock() instanceof net.minecraft.world.level.block.CactusBlock
+    // ||
+    // state.getBlock() instanceof net.minecraft.world.level.block.SugarCaneBlock) {
+    // return true;
+    // }
+
+    return false;
   }
 }
