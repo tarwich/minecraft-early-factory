@@ -3,6 +3,7 @@ package com.early_factory;
 import org.slf4j.Logger;
 
 import com.early_factory.block.BreakerBlock;
+import com.early_factory.block.CollectorBlock;
 import com.early_factory.block.PlacerBlock;
 import com.early_factory.block.entity.ModBlockEntities;
 import com.early_factory.menu.ModMenuTypes;
@@ -75,6 +76,12 @@ public class EarlyFactory {
     public static final RegistryObject<Item> PLACER_ITEM = ITEMS.register("placer",
             () -> new BlockItem(PLACER.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> COLLECTOR = BLOCKS.register("collector",
+            () -> new CollectorBlock());
+
+    public static final RegistryObject<Item> COLLECTOR_ITEM = ITEMS.register("collector",
+            () -> new BlockItem(COLLECTOR.get(), new Item.Properties()));
+
     public EarlyFactory() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -118,6 +125,7 @@ public class EarlyFactory {
             event.accept(GEAR_ITEM);
             event.accept(GEAR_BOX_ITEM);
             event.accept(BREAKER_ITEM);
+            event.accept(COLLECTOR_ITEM);
         }
         if (event.getTab() == CreativeModeTabs.INGREDIENTS) {
             event.accept(GEAR_ITEM);

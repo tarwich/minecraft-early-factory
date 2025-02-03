@@ -2,5 +2,6 @@
   "block.early_factory.gear_box": "Gear Box",
   "item.early_factory.gear": "Gear",
   "block.early_factory.breaker": "Breaker",
-  "block.early_factory.placer": "Placer"
+  "block.early_factory.placer": "Placer",
+  "block.early_factory.collector": "Collector"
 }

@@ -18,4 +18,8 @@ public class ModBlockEntities {
     public static final RegistryObject<BlockEntityType<PlacerBlockEntity>> PLACER = BLOCK_ENTITIES.register("placer",
             () -> BlockEntityType.Builder.of(PlacerBlockEntity::new,
                     EarlyFactory.PLACER.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<CollectorBlockEntity>> COLLECTOR = BLOCK_ENTITIES
+                    .register("collector", () -> BlockEntityType.Builder.of(CollectorBlockEntity::new,
+                                    EarlyFactory.COLLECTOR.get()).build(null));
 }
