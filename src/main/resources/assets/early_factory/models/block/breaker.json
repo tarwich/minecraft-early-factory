@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/cube",
   "textures": {
-    "all": "early_factory:block/breaker"
+    "particle": "early_factory:block/breaker_front",
+    "north": "early_factory:block/breaker_front",
+    "south": "early_factory:block/breaker_side",
+    "east": "early_factory:block/breaker_side",
+    "west": "early_factory:block/breaker_side",
+    "up": "early_factory:block/breaker_top",
+    "down": "early_factory:block/breaker_top"
   }
 }

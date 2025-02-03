@@ -1,6 +1,5 @@
 {
   "variants": {
-    "": { "model": "early_factory:block/breaker" },
     "facing=north": { "model": "early_factory:block/breaker" },
     "facing=east": { "model": "early_factory:block/breaker", "y": 90 },
     "facing=south": { "model": "early_factory:block/breaker", "y": 180 },
