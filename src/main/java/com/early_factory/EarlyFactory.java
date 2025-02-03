@@ -1,7 +1,8 @@
-package com.example.examplemod;
+package com.early_factory;
 
 import org.slf4j.Logger;
 
+import com.early_factory.block.BreakerBlock;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.Minecraft;
@@ -60,6 +61,12 @@ public class EarlyFactory {
     public static final RegistryObject<Item> GEAR_BOX_ITEM = ITEMS.register("gear_box",
             () -> new BlockItem(GEAR_BOX.get(), new Item.Properties()));
 
+    public static final RegistryObject<Block> BREAKER = BLOCKS.register("breaker",
+            () -> new BreakerBlock());
+
+    public static final RegistryObject<Item> BREAKER_ITEM = ITEMS.register("breaker",
+            () -> new BlockItem(BREAKER.get(), new Item.Properties()));
+
     public EarlyFactory() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -99,6 +106,7 @@ public class EarlyFactory {
             event.accept(EXAMPLE_BLOCK_ITEM);
             event.accept(GEAR_ITEM);
             event.accept(GEAR_BOX_ITEM);
+            event.accept(BREAKER_ITEM);
         }
         if (event.getTab() == CreativeModeTabs.INGREDIENTS) {
             event.accept(GEAR_ITEM);

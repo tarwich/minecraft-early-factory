@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": ["PGP", "GFG", "PGP"],
+  "pattern": ["WWW", "GPG", "WWW"],
   "key": {
-    "P": {
+    "W": {
       "tag": "minecraft:planks"
     },
     "G": {
       "item": "early_factory:gear"
     },
-    "F": {
-      "item": "minecraft:furnace"
+    "P": {
+      "item": "minecraft:wooden_pickaxe"
     }
   },
   "result": {
-    "item": "early_factory:gear_box",
+    "item": "early_factory:breaker",
     "count": 1
   }
 }

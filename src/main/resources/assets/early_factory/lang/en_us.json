@@ -1,4 +1,5 @@
 {
   "block.early_factory.gear_box": "Gear Box",
-  "item.early_factory.gear": "Gear"
+  "item.early_factory.gear": "Gear",
+  "block.early_factory.breaker": "Breaker"
 }
