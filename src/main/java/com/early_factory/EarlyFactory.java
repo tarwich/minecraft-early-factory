@@ -12,7 +12,7 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -54,8 +53,10 @@ public class EarlyFactory {
     // Creates a new BlockItem with the id "examplemod:example_block", combining the
     // namespace and path
     public static final RegistryObject<Item> EXAMPLE_BLOCK_ITEM = ITEMS.register("example_block",
-            () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties()));
-    public static final RegistryObject<Item> GEAR_ITEM = ITEMS.register("gear", () -> new Item(new Item.Properties()));
+            () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+    public static final RegistryObject<Item> GEAR_ITEM = ITEMS.register("gear",
+            () -> new Item(
+                    new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS).tab(CreativeModeTab.TAB_MATERIALS)));
 
     // Add this new block registration
     public static final RegistryObject<Block> GEAR_BOX = BLOCKS.register("gear_box",
@@ -64,23 +65,23 @@ public class EarlyFactory {
                     .requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Item> GEAR_BOX_ITEM = ITEMS.register("gear_box",
-            () -> new BlockItem(GEAR_BOX.get(), new Item.Properties()));
+            () -> new BlockItem(GEAR_BOX.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public static final RegistryObject<Block> BREAKER = BLOCKS.register("breaker",
             () -> new BreakerBlock());
 
     public static final RegistryObject<Item> BREAKER_ITEM = ITEMS.register("breaker",
-            () -> new BlockItem(BREAKER.get(), new Item.Properties()));
+            () -> new BlockItem(BREAKER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public static final RegistryObject<Block> PLACER = BLOCKS.register("placer", PlacerBlock::new);
     public static final RegistryObject<Item> PLACER_ITEM = ITEMS.register("placer",
-            () -> new BlockItem(PLACER.get(), new Item.Properties()));
+            () -> new BlockItem(PLACER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public static final RegistryObject<Block> COLLECTOR = BLOCKS.register("collector",
             () -> new CollectorBlock());
 
     public static final RegistryObject<Item> COLLECTOR_ITEM = ITEMS.register("collector",
-            () -> new BlockItem(COLLECTOR.get(), new Item.Properties()));
+            () -> new BlockItem(COLLECTOR.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public EarlyFactory() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -95,9 +96,6 @@ public class EarlyFactory {
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the
         // config file for us
@@ -117,19 +115,6 @@ public class EarlyFactory {
         LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
 
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
-    }
-
-    private void addCreative(CreativeModeTabEvent.BuildContents event) {
-        if (event.getTab() == CreativeModeTabs.BUILDING_BLOCKS) {
-            event.accept(EXAMPLE_BLOCK_ITEM);
-            event.accept(GEAR_ITEM);
-            event.accept(GEAR_BOX_ITEM);
-            event.accept(BREAKER_ITEM);
-            event.accept(COLLECTOR_ITEM);
-        }
-        if (event.getTab() == CreativeModeTabs.INGREDIENTS) {
-            event.accept(GEAR_ITEM);
-        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

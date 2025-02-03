@@ -1,4 +1,8 @@
 {
   "replace": false,
-  "values": ["early_factory:breaker"]
+  "values": [
+    "early_factory:breaker",
+    "early_factory:placer",
+    "early_factory:collector"
+  ]
 }
