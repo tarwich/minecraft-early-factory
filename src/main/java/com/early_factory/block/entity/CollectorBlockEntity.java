@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -37,8 +36,8 @@ public class CollectorBlockEntity extends BlockEntity {
       List<Entity> entities = level.getEntities(null, bounds);
 
       for (Entity item : entities) {
-        // Only collect items and experience orbs
-        if (item instanceof ItemEntity || item instanceof ExperienceOrb) {
+        // Only collect items
+        if (item instanceof ItemEntity) {
           // Calculate direction to collector
           double dx = pos.getX() + 0.5D - item.getX();
           double dy = pos.getY() + 0.5D - item.getY();
