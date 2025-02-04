@@ -6,7 +6,6 @@ import com.early_factory.block.CollectorBlock;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -30,8 +29,8 @@ public class CollectorBlockEntity extends BlockEntity {
 
     // Define collection area
     AABB collectionBox = new AABB(
-        pos.getX() - 5, pos.getY() - 1, pos.getZ() - 5,
-        pos.getX() + 6, pos.getY() + 2, pos.getZ() + 6);
+        pos.getX() - COLLECTION_RANGE, pos.getY() - 1, pos.getZ() - COLLECTION_RANGE,
+        pos.getX() + (COLLECTION_RANGE + 1), pos.getY() + 2, pos.getZ() + (COLLECTION_RANGE + 1));
 
     // Get all items in range
     List<ItemEntity> items = level.getEntitiesOfClass(
@@ -94,23 +93,6 @@ public class CollectorBlockEntity extends BlockEntity {
             dy / distance * speed,
             dz / distance * speed);
       }
-    }
-
-    // Get all experience orbs in range
-    List<ExperienceOrb> xpOrbs = level.getEntitiesOfClass(
-        ExperienceOrb.class,
-        collectionBox);
-
-    // Process each experience orb
-    for (ExperienceOrb orb : xpOrbs) {
-      // Skip if another collector is closer to this orb
-      AABB orbBox = orb.getBoundingBox();
-      if (CollectorBlock.shouldDeferToCloserCollector(level, pos, orbBox)) {
-        continue;
-      }
-
-      // Existing XP collection logic...
-      // ... rest of your XP collection code ...
     }
   }
 }
