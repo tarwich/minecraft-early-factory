@@ -74,7 +74,12 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
       BlockEntityType<T> blockEntityType) {
     return level.isClientSide ? null
         : createTickerHelper(blockEntityType, ModBlockEntities.BREAKER.get(),
-            (level1, pos, state1, blockEntity) -> ((BreakerBlockEntity) blockEntity).tick(level1, pos, state1));
+            (level1, pos, state1, blockEntity) -> {
+              // Minecraft runs at 20 ticks per second, so waiting 20 ticks = 1 second
+              if (level1.getGameTime() % 20 == 0) {
+                ((BreakerBlockEntity) blockEntity).tick(level1, pos, state1);
+              }
+            });
   }
 
   private static <T extends BlockEntity> BlockEntityTicker<T> createTickerHelper(BlockEntityType<T> actualType,
