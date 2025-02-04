@@ -1,5 +1,7 @@
 package com.early_factory.menu;
 
+import javax.annotation.Nonnull;
+
 import com.early_factory.EarlyFactory;
 import com.early_factory.block.entity.BreakerBlockEntity;
 
@@ -10,6 +12,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -25,7 +28,13 @@ public class BreakerMenu extends AbstractContainerMenu {
     super(ModMenuTypes.BREAKER_MENU.get(), id);
     checkContainerSize(inv, 1);
     blockEntity = (BreakerBlockEntity) entity;
-    this.levelAccess = ContainerLevelAccess.create(blockEntity.getLevel(), blockEntity.getBlockPos());
+    Level level = blockEntity.getLevel();
+
+    if (level == null) {
+      throw new IllegalArgumentException("Level is null");
+    }
+
+    this.levelAccess = ContainerLevelAccess.create(level, blockEntity.getBlockPos());
 
     // Add the breaker slot
     addSlot(new SlotItemHandler(blockEntity.getItemHandler(), 0, 80, 35));
@@ -44,13 +53,13 @@ public class BreakerMenu extends AbstractContainerMenu {
   }
 
   @Override
-  public boolean stillValid(Player player) {
+  public boolean stillValid(@Nonnull Player player) {
     return stillValid(this.levelAccess, player, EarlyFactory.BREAKER.get());
   }
 
   // This is called when a player shift-clicks items
   @Override
-  public ItemStack quickMoveStack(Player player, int index) {
+  public ItemStack quickMoveStack(@Nonnull Player player, int index) {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.slots.get(index);
 

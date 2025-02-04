@@ -1,5 +1,7 @@
 package com.early_factory.menu;
 
+import javax.annotation.Nonnull;
+
 import com.early_factory.EarlyFactory;
 import com.early_factory.block.entity.PlacerBlockEntity;
 
@@ -47,12 +49,12 @@ public class PlacerMenu extends AbstractContainerMenu {
   }
 
   @Override
-  public boolean stillValid(Player player) {
+  public boolean stillValid(@Nonnull Player player) {
     return stillValid(containerLevelAccess, player, EarlyFactory.PLACER.get());
   }
 
   @Override
-  public ItemStack quickMoveStack(Player player, int index) {
+  public ItemStack quickMoveStack(@Nonnull Player player, int index) {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.slots.get(index);
 

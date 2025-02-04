@@ -1,5 +1,7 @@
 package com.early_factory.block.entity;
 
+import javax.annotation.Nonnull;
+
 import com.early_factory.block.PlacerBlock;
 import com.early_factory.menu.PlacerMenu;
 
@@ -45,13 +47,13 @@ public class PlacerBlockEntity extends BlockEntity implements MenuProvider {
   }
 
   @Override
-  public void load(CompoundTag tag) {
+  public void load(@Nonnull CompoundTag tag) {
     super.load(tag);
     itemHandler.deserializeNBT(tag.getCompound("inventory"));
   }
 
   @Override
-  protected void saveAdditional(CompoundTag tag) {
+  protected void saveAdditional(@Nonnull CompoundTag tag) {
     tag.put("inventory", itemHandler.serializeNBT());
     super.saveAdditional(tag);
   }
@@ -80,7 +82,7 @@ public class PlacerBlockEntity extends BlockEntity implements MenuProvider {
   }
 
   @Override
-  public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+  public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inventory, @Nonnull Player player) {
     return new PlacerMenu(id, inventory, this);
   }
 

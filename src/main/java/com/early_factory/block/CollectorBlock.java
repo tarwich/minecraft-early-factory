@@ -2,6 +2,8 @@ package com.early_factory.block;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.early_factory.block.entity.CollectorBlockEntity;
 import com.early_factory.block.entity.ModBlockEntities;
 
@@ -24,25 +26,25 @@ public class CollectorBlock extends BaseEntityBlock {
   }
 
   @Override
-  public RenderShape getRenderShape(BlockState state) {
+  public RenderShape getRenderShape(@Nonnull BlockState state) {
     return RenderShape.MODEL;
   }
 
   @Override
-  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+  public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
     return new CollectorBlockEntity(pos, state);
   }
 
   @Override
-  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
-      BlockEntityType<T> type) {
+  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state,
+      @Nonnull BlockEntityType<T> type) {
     return createTickerHelper(type, ModBlockEntities.COLLECTOR.get(),
         CollectorBlockEntity::tick);
   }
 
   /**
    * Checks if there is a closer collector to the given entity box
-   * 
+   *
    * @return true if this collector should defer to another collector
    */
   public static boolean shouldDeferToCloserCollector(Level level, BlockPos thisPos, AABB entityBox) {

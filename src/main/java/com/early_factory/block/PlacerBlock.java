@@ -1,5 +1,7 @@
 package com.early_factory.block;
 
+import javax.annotation.Nonnull;
+
 import com.early_factory.block.entity.ModBlockEntities;
 import com.early_factory.block.entity.PlacerBlockEntity;
 
@@ -37,22 +39,24 @@ public class PlacerBlock extends BaseEntityBlock {
   }
 
   @Override
-  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+  protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
     builder.add(FACING);
   }
 
   @Override
-  public BlockState getStateForPlacement(BlockPlaceContext context) {
+  public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
     return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
   }
 
   @Override
-  public RenderShape getRenderShape(BlockState state) {
+  public RenderShape getRenderShape(@Nonnull BlockState state) {
     return RenderShape.MODEL;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+  public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+      @Nonnull BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {
       BlockEntity blockEntity = level.getBlockEntity(pos);
       if (blockEntity instanceof PlacerBlockEntity) {
@@ -63,8 +67,8 @@ public class PlacerBlock extends BaseEntityBlock {
   }
 
   @Override
-  public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
-      InteractionHand hand, BlockHitResult hit) {
+  public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+      @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
     if (!level.isClientSide()) {
       BlockEntity entity = level.getBlockEntity(pos);
       if (entity instanceof PlacerBlockEntity) {
@@ -76,13 +80,13 @@ public class PlacerBlock extends BaseEntityBlock {
   }
 
   @Override
-  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+  public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
     return new PlacerBlockEntity(pos, state);
   }
 
   @Override
-  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
-      BlockEntityType<T> type) {
+  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state,
+      @Nonnull BlockEntityType<T> type) {
     return createTickerHelper(type, ModBlockEntities.PLACER.get(),
         (level1, pos, state1, be) -> ((PlacerBlockEntity) be).tick(level1, pos, state1));
   }

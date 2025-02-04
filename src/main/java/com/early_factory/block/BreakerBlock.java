@@ -1,5 +1,7 @@
 package com.early_factory.block;
 
+import javax.annotation.Nonnull;
+
 import com.early_factory.block.entity.BreakerBlockEntity;
 import com.early_factory.block.entity.ModBlockEntities;
 
@@ -39,26 +41,26 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
   }
 
   @Override
-  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+  protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
     super.createBlockStateDefinition(builder);
     builder.add(FACING);
   }
 
   @Override
-  public BlockState getStateForPlacement(BlockPlaceContext context) {
+  public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
     // Get the opposite of the direction the player is looking at
     // This makes the block face away from the player
     return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
   }
 
   @Override
-  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+  public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
     return new BreakerBlockEntity(pos, state);
   }
 
   @Override
-  public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
-      InteractionHand hand, BlockHitResult hit) {
+  public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+      @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
     if (!level.isClientSide()) {
       BlockEntity be = level.getBlockEntity(pos);
       if (be instanceof BreakerBlockEntity) {
@@ -70,8 +72,8 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
   }
 
   @Override
-  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
-      BlockEntityType<T> blockEntityType) {
+  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state,
+      @Nonnull BlockEntityType<T> blockEntityType) {
     return level.isClientSide ? null
         : createTickerHelper(blockEntityType, ModBlockEntities.BREAKER.get(),
             (level1, pos, state1, blockEntity) -> {

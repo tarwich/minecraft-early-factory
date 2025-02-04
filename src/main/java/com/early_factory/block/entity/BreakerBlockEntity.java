@@ -3,6 +3,8 @@ package com.early_factory.block.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import com.early_factory.block.BreakerBlock;
 import com.early_factory.menu.BreakerMenu;
 
@@ -49,13 +51,13 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
   }
 
   @Override
-  public void load(CompoundTag tag) {
+  public void load(@Nonnull CompoundTag tag) {
     super.load(tag);
     itemHandler.deserializeNBT(tag.getCompound("inventory"));
   }
 
   @Override
-  protected void saveAdditional(CompoundTag tag) {
+  protected void saveAdditional(@Nonnull CompoundTag tag) {
     tag.put("inventory", itemHandler.serializeNBT());
     super.saveAdditional(tag);
   }
@@ -84,13 +86,11 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
   }
 
   @Override
-  public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
+  public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inventory, @Nonnull Player player) {
     return new BreakerMenu(id, inventory, this);
   }
 
   private void breakBlock(Level level, BlockPos pos, FakePlayer fakePlayer, ItemStack tool) {
-    BlockState state = level.getBlockState(pos);
-
     // Break the block
     level.destroyBlock(pos, true, fakePlayer);
 
@@ -202,7 +202,7 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     // Check for sweet berry bush
-    if (state.getBlock() instanceof net.minecraft.world.level.block.SweetBerryBushBlock bush) {
+    if (state.getBlock() instanceof net.minecraft.world.level.block.SweetBerryBushBlock) {
       return state.getValue(net.minecraft.world.level.block.SweetBerryBushBlock.AGE) < 3;
     }
 
