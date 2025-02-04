@@ -2,6 +2,7 @@ package com.early_factory.block.entity;
 
 import javax.annotation.Nonnull;
 
+import com.early_factory.ModBlockEntities;
 import com.early_factory.block.PlacerBlock;
 import com.early_factory.menu.PlacerMenu;
 

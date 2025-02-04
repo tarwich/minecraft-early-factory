@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.early_factory.ModBlockEntities;
 import com.early_factory.block.entity.CollectorBlockEntity;
-import com.early_factory.block.entity.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

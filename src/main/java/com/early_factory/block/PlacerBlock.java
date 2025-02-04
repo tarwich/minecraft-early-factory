@@ -2,7 +2,7 @@ package com.early_factory.block;
 
 import javax.annotation.Nonnull;
 
-import com.early_factory.block.entity.ModBlockEntities;
+import com.early_factory.ModBlockEntities;
 import com.early_factory.block.entity.PlacerBlockEntity;
 
 import net.minecraft.core.BlockPos;

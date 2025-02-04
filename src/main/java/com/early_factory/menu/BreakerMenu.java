@@ -2,7 +2,7 @@ package com.early_factory.menu;
 
 import javax.annotation.Nonnull;
 
-import com.early_factory.EarlyFactory;
+import com.early_factory.ModBlocks;
 import com.early_factory.block.entity.BreakerBlockEntity;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -54,7 +54,7 @@ public class BreakerMenu extends AbstractContainerMenu {
 
   @Override
   public boolean stillValid(@Nonnull Player player) {
-    return stillValid(this.levelAccess, player, EarlyFactory.BREAKER.get());
+    return stillValid(this.levelAccess, player, ModBlocks.BREAKER.get());
   }
 
   // This is called when a player shift-clicks items

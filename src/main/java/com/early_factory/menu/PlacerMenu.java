@@ -2,7 +2,7 @@ package com.early_factory.menu;
 
 import javax.annotation.Nonnull;
 
-import com.early_factory.EarlyFactory;
+import com.early_factory.ModBlocks;
 import com.early_factory.block.entity.PlacerBlockEntity;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -50,7 +50,7 @@ public class PlacerMenu extends AbstractContainerMenu {
 
   @Override
   public boolean stillValid(@Nonnull Player player) {
-    return stillValid(containerLevelAccess, player, EarlyFactory.PLACER.get());
+    return stillValid(containerLevelAccess, player, ModBlocks.PLACER.get());
   }
 
   @Override

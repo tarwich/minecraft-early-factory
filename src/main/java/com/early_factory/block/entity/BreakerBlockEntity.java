@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import com.early_factory.ModBlockEntities;
 import com.early_factory.block.BreakerBlock;
 import com.early_factory.menu.BreakerMenu;
 

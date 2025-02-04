@@ -2,10 +2,6 @@ package com.early_factory;
 
 import org.slf4j.Logger;
 
-import com.early_factory.block.BreakerBlock;
-import com.early_factory.block.CollectorBlock;
-import com.early_factory.block.PlacerBlock;
-import com.early_factory.block.entity.ModBlockEntities;
 import com.early_factory.menu.ModMenuTypes;
 import com.early_factory.screen.PlacerScreen;
 import com.mojang.logging.LogUtils;
@@ -29,7 +25,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -39,49 +34,27 @@ public class EarlyFactory {
     public static final String MODID = "early_factory";
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Blocks which will all be registered under
-    // the "examplemod" namespace
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    // Create a Deferred Register to hold Items which will all be registered under
-    // the "examplemod" namespace
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
 
     // Creates a new Block with the id "examplemod:example_block", combining the
     // namespace and path
-    public static final RegistryObject<Block> EXAMPLE_BLOCK = BLOCKS.register("example_block",
-            () -> new Block(BlockBehaviour.Properties.of(Material.STONE)));
+    public static final RegistryObject<Block> EXAMPLE_BLOCK = ModBlocks.BLOCKS.register("example_block",
+                () -> new Block(BlockBehaviour.Properties.of(Material.STONE)));
     // Creates a new BlockItem with the id "examplemod:example_block", combining the
     // namespace and path
-    public static final RegistryObject<Item> EXAMPLE_BLOCK_ITEM = ITEMS.register("example_block",
-            () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
-    public static final RegistryObject<Item> GEAR_ITEM = ITEMS.register("gear",
-            () -> new Item(
+    public static final RegistryObject<Item> EXAMPLE_BLOCK_ITEM = ModItems.ITEMS.register("example_block",
+        () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+    public static final RegistryObject<Item> GEAR_ITEM = ModItems.ITEMS.register("gear",
+        () -> new Item(
                     new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS).tab(CreativeModeTab.TAB_MATERIALS)));
 
     // Add this new block registration
-    public static final RegistryObject<Block> GEAR_BOX = BLOCKS.register("gear_box",
-            () -> new Block(BlockBehaviour.Properties.of(Material.METAL)
+    public static final RegistryObject<Block> GEAR_BOX = ModBlocks.BLOCKS.register("gear_box",
+                () -> new Block(BlockBehaviour.Properties.of(Material.METAL)
                     .strength(3.5F)
                     .requiresCorrectToolForDrops()));
 
-    public static final RegistryObject<Item> GEAR_BOX_ITEM = ITEMS.register("gear_box",
-            () -> new BlockItem(GEAR_BOX.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
-
-    public static final RegistryObject<Block> BREAKER = BLOCKS.register("breaker",
-            () -> new BreakerBlock());
-
-    public static final RegistryObject<Item> BREAKER_ITEM = ITEMS.register("breaker",
-            () -> new BlockItem(BREAKER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
-
-    public static final RegistryObject<Block> PLACER = BLOCKS.register("placer", PlacerBlock::new);
-    public static final RegistryObject<Item> PLACER_ITEM = ITEMS.register("placer",
-            () -> new BlockItem(PLACER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
-
-    public static final RegistryObject<Block> COLLECTOR = BLOCKS.register("collector",
-            () -> new CollectorBlock());
-
-    public static final RegistryObject<Item> COLLECTOR_ITEM = ITEMS.register("collector",
-            () -> new BlockItem(COLLECTOR.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+    public static final RegistryObject<Item> GEAR_BOX_ITEM = ModItems.ITEMS.register("gear_box",
+        () -> new BlockItem(GEAR_BOX.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public EarlyFactory() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -90,9 +63,9 @@ public class EarlyFactory {
         modEventBus.addListener(this::commonSetup);
 
         // Register the Deferred Register to the mod event bus so blocks get registered
-        BLOCKS.register(modEventBus);
+        ModBlocks.BLOCKS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so items get registered
-        ITEMS.register(modEventBus);
+        ModItems.ITEMS.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

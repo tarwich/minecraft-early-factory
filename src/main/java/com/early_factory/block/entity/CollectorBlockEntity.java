@@ -2,6 +2,7 @@ package com.early_factory.block.entity;
 
 import java.util.List;
 
+import com.early_factory.ModBlockEntities;
 import com.early_factory.block.CollectorBlock;
 
 import net.minecraft.core.BlockPos;
