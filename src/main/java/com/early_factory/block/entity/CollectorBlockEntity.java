@@ -2,9 +2,11 @@ package com.early_factory.block.entity;
 
 import java.util.List;
 
+import com.early_factory.block.CollectorBlock;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -21,73 +23,94 @@ public class CollectorBlockEntity extends BlockEntity {
     super(ModBlockEntities.COLLECTOR.get(), pos, state);
   }
 
-  public static void tick(Level level, BlockPos pos, BlockState state, CollectorBlockEntity entity) {
-    if (!level.isClientSide) {
-      // Create a bounding box around the collector
-      AABB bounds = new AABB(
-          pos.getX() - COLLECTION_RANGE,
-          pos.getY() - COLLECTION_RANGE,
-          pos.getZ() - COLLECTION_RANGE,
-          pos.getX() + COLLECTION_RANGE + 1,
-          pos.getY() + COLLECTION_RANGE + 1,
-          pos.getZ() + COLLECTION_RANGE + 1);
+  public static void tick(Level level, BlockPos pos, BlockState state, CollectorBlockEntity blockEntity) {
+    if (level.isClientSide()) {
+      return;
+    }
 
-      // Get all entities within range
-      List<Entity> entities = level.getEntities(null, bounds);
+    // Define collection area
+    AABB collectionBox = new AABB(
+        pos.getX() - 5, pos.getY() - 1, pos.getZ() - 5,
+        pos.getX() + 6, pos.getY() + 2, pos.getZ() + 6);
 
-      for (Entity item : entities) {
-        // Only collect items
-        if (item instanceof ItemEntity) {
-          // Calculate direction to collector
-          double dx = pos.getX() + 0.5D - item.getX();
-          double dy = pos.getY() + 0.5D - item.getY();
-          double dz = pos.getZ() + 0.5D - item.getZ();
+    // Get all items in range
+    List<ItemEntity> items = level.getEntitiesOfClass(
+        ItemEntity.class,
+        collectionBox);
 
-          double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    // Process each item
+    for (ItemEntity item : items) {
+      // Skip if another collector is closer to this item
+      AABB itemBox = item.getBoundingBox();
+      if (CollectorBlock.shouldDeferToCloserCollector(level, pos, itemBox)) {
+        continue;
+      }
 
-          // If item is close enough to collector, try to insert into adjacent inventory
-          if (distance < 1.0D && item instanceof ItemEntity itemEntity) {
-            ItemStack stack = itemEntity.getItem();
-            boolean inserted = false;
+      // Calculate direction to collector
+      double dx = pos.getX() + 0.5D - item.getX();
+      double dy = pos.getY() + 0.5D - item.getY();
+      double dz = pos.getZ() + 0.5D - item.getZ();
 
-            // Try each direction
-            for (Direction direction : Direction.values()) {
-              if (inserted)
-                break;
+      double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-              BlockEntity targetEntity = level.getBlockEntity(pos.relative(direction));
-              if (targetEntity != null) {
-                // Try to get item handler capability
-                IItemHandler inventory = targetEntity
-                    .getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite())
-                    .resolve().orElse(null);
+      // If item is close enough to collector, try to insert into adjacent inventory
+      if (distance < 1.0D) {
+        ItemStack stack = item.getItem();
+        boolean inserted = false;
 
-                if (inventory != null) {
-                  // Try to insert into each slot
-                  for (int i = 0; i < inventory.getSlots() && !stack.isEmpty(); i++) {
-                    stack = inventory.insertItem(i, stack, false);
-                  }
+        // Try each direction
+        for (Direction direction : Direction.values()) {
+          if (inserted)
+            break;
 
-                  // If we inserted all items, remove the entity
-                  if (stack.isEmpty()) {
-                    itemEntity.discard();
-                    inserted = true;
-                  }
-                }
+          BlockEntity targetEntity = level.getBlockEntity(pos.relative(direction));
+          if (targetEntity != null) {
+            // Try to get item handler capability
+            IItemHandler inventory = targetEntity
+                .getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite())
+                .resolve().orElse(null);
+
+            if (inventory != null) {
+              // Try to insert into each slot
+              for (int i = 0; i < inventory.getSlots() && !stack.isEmpty(); i++) {
+                stack = inventory.insertItem(i, stack, false);
+              }
+
+              // If we inserted all items, remove the entity
+              if (stack.isEmpty()) {
+                item.discard();
+                inserted = true;
               }
             }
           }
-
-          // If not inserted into inventory, keep pulling towards collector
-          if (!item.isRemoved()) {
-            double speed = 0.3D;
-            item.setDeltaMovement(
-                dx / distance * speed,
-                dy / distance * speed,
-                dz / distance * speed);
-          }
         }
       }
+
+      // If not inserted into inventory, keep pulling towards collector
+      if (!item.isRemoved()) {
+        double speed = 0.3D;
+        item.setDeltaMovement(
+            dx / distance * speed,
+            dy / distance * speed,
+            dz / distance * speed);
+      }
+    }
+
+    // Get all experience orbs in range
+    List<ExperienceOrb> xpOrbs = level.getEntitiesOfClass(
+        ExperienceOrb.class,
+        collectionBox);
+
+    // Process each experience orb
+    for (ExperienceOrb orb : xpOrbs) {
+      // Skip if another collector is closer to this orb
+      AABB orbBox = orb.getBoundingBox();
+      if (CollectorBlock.shouldDeferToCloserCollector(level, pos, orbBox)) {
+        continue;
+      }
+
+      // Existing XP collection logic...
+      // ... rest of your XP collection code ...
     }
   }
 }
