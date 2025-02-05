@@ -104,7 +104,7 @@ public class CollectorBlockEntity extends BlockEntity {
   }
 
   private boolean shouldCollectItem(Level level, BlockPos pos, ItemEntity itemEntity) {
-    // Check for players within 2 blocks of the item
+    // Check for sneaking players within 2 blocks of the item
     List<Player> nearbyPlayers = level.getEntitiesOfClass(
         Player.class,
         new AABB(
@@ -114,9 +114,10 @@ public class CollectorBlockEntity extends BlockEntity {
             itemEntity.getX() + 2,
             itemEntity.getY() + 2,
             itemEntity.getZ() + 2),
-        player -> true);
+        player -> player.isCrouching()); // Only check for sneaking players
 
-    // If there are nearby players, check if they have a clear path to the item
+    // If there are nearby sneaking players, check if they have a clear path to the
+    // item
     for (Player player : nearbyPlayers) {
       // Create a ray from player eyes to item center
       Vec3 playerEyes = player.getEyePosition();
