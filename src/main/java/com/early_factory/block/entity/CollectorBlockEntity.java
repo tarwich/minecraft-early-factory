@@ -54,33 +54,31 @@ public class CollectorBlockEntity extends BlockEntity {
       double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
       // If item is close enough to collector, try to insert into adjacent inventory
-      if (distance < 1.0D) {
-        ItemStack stack = item.getItem();
-        boolean inserted = false;
+      ItemStack stack = item.getItem();
+      boolean inserted = false;
 
-        // Try each direction
-        for (Direction direction : Direction.values()) {
-          if (inserted)
-            break;
+      // Try each direction
+      for (Direction direction : Direction.values()) {
+        if (inserted)
+          break;
 
-          BlockEntity targetEntity = level.getBlockEntity(pos.relative(direction));
-          if (targetEntity != null) {
-            // Try to get item handler capability
-            IItemHandler inventory = targetEntity
-                .getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite())
-                .resolve().orElse(null);
+        BlockEntity targetEntity = level.getBlockEntity(pos.relative(direction));
+        if (targetEntity != null) {
+          // Try to get item handler capability
+          IItemHandler inventory = targetEntity
+              .getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite())
+              .resolve().orElse(null);
 
-            if (inventory != null) {
-              // Try to insert into each slot
-              for (int i = 0; i < inventory.getSlots() && !stack.isEmpty(); i++) {
-                stack = inventory.insertItem(i, stack, false);
-              }
+          if (inventory != null) {
+            // Try to insert into each slot
+            for (int i = 0; i < inventory.getSlots() && !stack.isEmpty(); i++) {
+              stack = inventory.insertItem(i, stack, false);
+            }
 
-              // If we inserted all items, remove the entity
-              if (stack.isEmpty()) {
-                item.discard();
-                inserted = true;
-              }
+            // If we inserted all items, remove the entity
+            if (stack.isEmpty()) {
+              item.discard();
+              inserted = true;
             }
           }
         }
