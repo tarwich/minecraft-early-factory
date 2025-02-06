@@ -91,13 +91,15 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
     return new BreakerMenu(id, inventory, this);
   }
 
-  private void breakBlock(Level level, BlockPos pos, FakePlayer fakePlayer, ItemStack tool) {
+  private void breakBlock(Level level, BlockPos pos, FakePlayer fakePlayer, ItemStack tool, boolean shouldDamageTool) {
     // Break the block
     level.destroyBlock(pos, true, fakePlayer);
 
-    // Damage the tool
-    tool.hurtAndBreak(1, fakePlayer, (player) -> {
-    });
+    // Damage the tool if requested
+    if (shouldDamageTool) {
+      tool.hurtAndBreak(1, fakePlayer, (player) -> {
+      });
+    }
   }
 
   private void breakTreeRecursively(Level level, BlockPos startPos, FakePlayer fakePlayer, ItemStack tool,
@@ -115,7 +117,8 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
       return;
     }
 
-    breakBlock(level, startPos, fakePlayer, tool);
+    // Break block without damaging tool during recursive calls
+    breakBlock(level, startPos, fakePlayer, tool, false);
 
     // For logs, check all directions. For leaves, only check adjacent blocks
     int range = isLog ? 1 : 1;
@@ -174,9 +177,12 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
         // If it's a log, break the whole tree
         if (targetState.is(net.minecraft.tags.BlockTags.LOGS)) {
           breakTreeRecursively(level, targetPos, fakePlayer, tool, new HashSet<>());
+          // Damage tool once after breaking the whole tree
+          tool.hurtAndBreak(1, fakePlayer, (player) -> {
+          });
         } else {
-          // Just break the single block
-          breakBlock(level, targetPos, fakePlayer, tool);
+          // Just break the single block with tool damage
+          breakBlock(level, targetPos, fakePlayer, tool, true);
         }
 
         // Update the inventory with the potentially damaged tool
