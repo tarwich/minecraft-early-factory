@@ -156,8 +156,8 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
     BlockPos targetPos = pos.relative(facing);
     BlockState targetState = level.getBlockState(targetPos);
 
-    // Skip if target is air or a growing plant
-    if (targetState.isAir() || isGrowingPlant(targetState)) {
+    // Skip if target is air, a growing plant, or any fluid
+    if (targetState.isAir() || isGrowingPlant(targetState) || !targetState.getFluidState().isEmpty()) {
       return;
     }
 
