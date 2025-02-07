@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -226,5 +227,19 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
     // }
 
     return false;
+  }
+
+  public void dropInventory(Level level, BlockPos pos) {
+    for (int i = 0; i < itemHandler.getSlots(); i++) {
+      ItemStack stack = itemHandler.getStackInSlot(i);
+      if (!stack.isEmpty()) {
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 0.5;
+        double z = pos.getZ() + 0.5;
+        ItemEntity itemEntity = new ItemEntity(level, x, y, z, stack);
+        level.addFreshEntity(itemEntity);
+        itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+      }
+    }
   }
 }

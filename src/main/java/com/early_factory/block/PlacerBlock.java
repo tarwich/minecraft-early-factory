@@ -57,10 +57,10 @@ public class PlacerBlock extends BaseEntityBlock {
   @Override
   public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
       @Nonnull BlockState newState, boolean isMoving) {
-    if (state.getBlock() != newState.getBlock()) {
+    if (!state.is(newState.getBlock())) {
       BlockEntity blockEntity = level.getBlockEntity(pos);
-      if (blockEntity instanceof PlacerBlockEntity) {
-        ((PlacerBlockEntity) blockEntity).getItemHandler().setStackInSlot(0, net.minecraft.world.item.ItemStack.EMPTY);
+      if (blockEntity instanceof PlacerBlockEntity placer) {
+        placer.dropInventory(level, pos);
       }
     }
     super.onRemove(state, level, pos, newState, isMoving);

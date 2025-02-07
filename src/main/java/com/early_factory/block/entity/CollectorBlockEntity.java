@@ -236,4 +236,20 @@ public class CollectorBlockEntity extends BlockEntity implements MenuProvider {
         this.worldPosition.getY() + 0.5D,
         this.worldPosition.getZ() + 0.5D) <= 64.0D;
   }
+
+  public void dropInventory(Level level, BlockPos pos) {
+    for (int i = 0; i < inventory.getSlots(); i++) {
+      ItemStack stack = inventory.getStackInSlot(i);
+      if (!stack.isEmpty()) {
+        // Create an ItemEntity and spawn it in the world
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 0.5;
+        double z = pos.getZ() + 0.5;
+        ItemEntity itemEntity = new ItemEntity(level, x, y, z, stack);
+        level.addFreshEntity(itemEntity);
+        // Clear the slot
+        inventory.setStackInSlot(i, ItemStack.EMPTY);
+      }
+    }
+  }
 }

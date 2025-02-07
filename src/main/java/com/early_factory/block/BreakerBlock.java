@@ -88,4 +88,15 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
       BlockEntityType<?> expectedType, BlockEntityTicker<? super BlockEntity> ticker) {
     return expectedType == actualType ? (BlockEntityTicker<T>) ticker : null;
   }
+
+  @Override
+  public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+    if (!state.is(newState.getBlock())) {
+      BlockEntity blockEntity = level.getBlockEntity(pos);
+      if (blockEntity instanceof BreakerBlockEntity breaker) {
+        breaker.dropInventory(level, pos);
+      }
+    }
+    super.onRemove(state, level, pos, newState, isMoving);
+  }
 }
