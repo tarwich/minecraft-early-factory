@@ -2,7 +2,7 @@ package com.early_factory;
 
 import org.slf4j.Logger;
 
-import com.early_factory.menu.ModMenuTypes;
+import com.early_factory.screen.CollectorScreen;
 import com.early_factory.screen.PlacerScreen;
 import com.mojang.logging.LogUtils;
 
@@ -38,23 +38,23 @@ public class EarlyFactory {
     // Creates a new Block with the id "examplemod:example_block", combining the
     // namespace and path
     public static final RegistryObject<Block> EXAMPLE_BLOCK = ModBlocks.BLOCKS.register("example_block",
-                () -> new Block(BlockBehaviour.Properties.of(Material.STONE)));
+            () -> new Block(BlockBehaviour.Properties.of(Material.STONE)));
     // Creates a new BlockItem with the id "examplemod:example_block", combining the
     // namespace and path
     public static final RegistryObject<Item> EXAMPLE_BLOCK_ITEM = ModItems.ITEMS.register("example_block",
-        () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+            () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
     public static final RegistryObject<Item> GEAR_ITEM = ModItems.ITEMS.register("gear",
-        () -> new Item(
+            () -> new Item(
                     new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS).tab(CreativeModeTab.TAB_MATERIALS)));
 
     // Add this new block registration
     public static final RegistryObject<Block> GEAR_BOX = ModBlocks.BLOCKS.register("gear_box",
-                () -> new Block(BlockBehaviour.Properties.of(Material.METAL)
+            () -> new Block(BlockBehaviour.Properties.of(Material.METAL)
                     .strength(3.5F)
                     .requiresCorrectToolForDrops()));
 
     public static final RegistryObject<Item> GEAR_BOX_ITEM = ModItems.ITEMS.register("gear_box",
-        () -> new BlockItem(GEAR_BOX.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+            () -> new BlockItem(GEAR_BOX.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public EarlyFactory() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -105,6 +105,7 @@ public class EarlyFactory {
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
                 MenuScreens.register(ModMenuTypes.PLACER.get(), PlacerScreen::new);
+                MenuScreens.register(ModMenuTypes.COLLECTOR_MENU.get(), CollectorScreen::new);
             });
         }
     }

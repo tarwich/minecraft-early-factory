@@ -8,6 +8,10 @@ import com.early_factory.ModBlockEntities;
 import com.early_factory.block.entity.CollectorBlockEntity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -17,6 +21,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 
 public class CollectorBlock extends BaseEntityBlock {
   public CollectorBlock() {
@@ -72,5 +78,18 @@ public class CollectorBlock extends BaseEntityBlock {
 
     // Check if any other collector is closer
     return collectors.stream().anyMatch(otherPos -> otherPos.distToCenterSqr(entityX, entityY, entityZ) < thisDistance);
+  }
+
+  @Override
+  public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+      InteractionHand hand, BlockHitResult hit) {
+    if (!level.isClientSide()) {
+      BlockEntity be = level.getBlockEntity(pos);
+      if (be instanceof CollectorBlockEntity) {
+        NetworkHooks.openScreen((ServerPlayer) player, (CollectorBlockEntity) be, pos);
+      }
+      return InteractionResult.CONSUME;
+    }
+    return InteractionResult.SUCCESS;
   }
 }

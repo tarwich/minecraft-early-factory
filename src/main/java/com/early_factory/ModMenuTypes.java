@@ -1,6 +1,8 @@
-package com.early_factory.menu;
+package com.early_factory;
 
-import com.early_factory.EarlyFactory;
+import com.early_factory.menu.BreakerMenu;
+import com.early_factory.menu.CollectorMenu;
+import com.early_factory.menu.PlacerMenu;
 
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -16,5 +18,8 @@ public class ModMenuTypes {
       () -> IForgeMenuType.create(BreakerMenu::new));
 
   public static final RegistryObject<MenuType<PlacerMenu>> PLACER = MENUS.register("placer",
-          () -> IForgeMenuType.create(PlacerMenu::new));
+      () -> IForgeMenuType.create(PlacerMenu::new));
+
+  public static final RegistryObject<MenuType<CollectorMenu>> COLLECTOR_MENU = MENUS.register("collector_menu",
+      () -> IForgeMenuType.create(CollectorMenu::new));
 }

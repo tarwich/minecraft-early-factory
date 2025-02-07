@@ -3,6 +3,7 @@ package com.early_factory.menu;
 import javax.annotation.Nonnull;
 
 import com.early_factory.ModBlocks;
+import com.early_factory.ModMenuTypes;
 import com.early_factory.block.entity.PlacerBlockEntity;
 
 import net.minecraft.network.FriendlyByteBuf;
