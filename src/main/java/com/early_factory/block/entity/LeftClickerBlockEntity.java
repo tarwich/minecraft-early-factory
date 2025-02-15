@@ -84,7 +84,7 @@ public class LeftClickerBlockEntity extends BlockEntity implements MenuProvider 
 
   @Override
   public Component getDisplayName() {
-    return Component.translatable("block.early_factory.left_clicker_block");
+    return Component.translatable("block.early_factory.left_clicker");
   }
 
   @Override
