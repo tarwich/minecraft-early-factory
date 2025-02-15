@@ -1,6 +1,6 @@
 package com.early_factory;
 
-import com.early_factory.menu.BreakerMenu;
+import com.early_factory.menu.LeftClickerMenu;
 import com.early_factory.menu.CollectorMenu;
 import com.early_factory.menu.PlacerMenu;
 
@@ -14,8 +14,8 @@ public class ModMenuTypes {
   public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES,
       EarlyFactory.MODID);
 
-  public static final RegistryObject<MenuType<BreakerMenu>> BREAKER_MENU = MENUS.register("breaker_menu",
-      () -> IForgeMenuType.create(BreakerMenu::new));
+  public static final RegistryObject<MenuType<LeftClickerMenu>> LEFT_CLICKER_MENU = MENUS.register("left_clicker_menu",
+          () -> IForgeMenuType.create(LeftClickerMenu::new));
 
   public static final RegistryObject<MenuType<PlacerMenu>> PLACER = MENUS.register("placer",
       () -> IForgeMenuType.create(PlacerMenu::new));

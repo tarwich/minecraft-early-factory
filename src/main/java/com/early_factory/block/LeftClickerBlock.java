@@ -3,7 +3,7 @@ package com.early_factory.block;
 import javax.annotation.Nonnull;
 
 import com.early_factory.ModBlockEntities;
-import com.early_factory.block.entity.BreakerBlockEntity;
+import com.early_factory.block.entity.LeftClickerBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,10 +27,10 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 
-public class BreakerBlock extends DirectionalBlock implements EntityBlock {
+public class LeftClickerBlock extends DirectionalBlock implements EntityBlock {
   public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 
-  public BreakerBlock() {
+  public LeftClickerBlock() {
     super(BlockBehaviour.Properties.of(Material.WOOD)
         .strength(3.5f)
         .requiresCorrectToolForDrops());
@@ -55,7 +55,7 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
 
   @Override
   public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-    return new BreakerBlockEntity(pos, state);
+    return new LeftClickerBlockEntity(pos, state);
   }
 
   @Override
@@ -63,8 +63,8 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
       @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
     if (!level.isClientSide()) {
       BlockEntity be = level.getBlockEntity(pos);
-      if (be instanceof BreakerBlockEntity) {
-        NetworkHooks.openScreen((ServerPlayer) player, (BreakerBlockEntity) be, pos);
+      if (be instanceof LeftClickerBlockEntity) {
+        NetworkHooks.openScreen((ServerPlayer) player, (LeftClickerBlockEntity) be, pos);
         return InteractionResult.sidedSuccess(true);
       }
     }
@@ -75,11 +75,11 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state,
       @Nonnull BlockEntityType<T> blockEntityType) {
     return level.isClientSide ? null
-        : createTickerHelper(blockEntityType, ModBlockEntities.BREAKER.get(),
+        : createTickerHelper(blockEntityType, ModBlockEntities.LEFT_CLICKER.get(),
             (level1, pos, state1, blockEntity) -> {
               // Minecraft runs at 20 ticks per second, so waiting 10 ticks = 0.5 seconds
               if (level1.getGameTime() % 10 == 0) {
-                ((BreakerBlockEntity) blockEntity).tick(level1, pos, state1);
+                ((LeftClickerBlockEntity) blockEntity).tick(level1, pos, state1);
               }
             });
   }
@@ -93,8 +93,8 @@ public class BreakerBlock extends DirectionalBlock implements EntityBlock {
   public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
     if (!state.is(newState.getBlock())) {
       BlockEntity blockEntity = level.getBlockEntity(pos);
-      if (blockEntity instanceof BreakerBlockEntity breaker) {
-        breaker.dropInventory(level, pos);
+      if (blockEntity instanceof LeftClickerBlockEntity leftClicker) {
+        leftClicker.dropInventory(level, pos);
       }
     }
     super.onRemove(state, level, pos, newState, isMoving);

@@ -6,8 +6,8 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 
 import com.early_factory.ModBlockEntities;
-import com.early_factory.block.BreakerBlock;
-import com.early_factory.menu.BreakerMenu;
+import com.early_factory.block.LeftClickerBlock;
+import com.early_factory.menu.LeftClickerMenu;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,7 +36,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
+public class LeftClickerBlockEntity extends BlockEntity implements MenuProvider {
   private final ItemStackHandler itemHandler = new ItemStackHandler(1) {
     @Override
     protected void onContentsChanged(int slot) {
@@ -48,8 +48,8 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
 
   private FakePlayer fakePlayer;
 
-  public BreakerBlockEntity(BlockPos pos, BlockState state) {
-    super(ModBlockEntities.BREAKER.get(), pos, state);
+  public LeftClickerBlockEntity(BlockPos pos, BlockState state) {
+    super(ModBlockEntities.LEFT_CLICKER.get(), pos, state);
   }
 
   @Override
@@ -84,12 +84,12 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
 
   @Override
   public Component getDisplayName() {
-    return Component.translatable("block.early_factory.breaker");
+    return Component.translatable("block.early_factory.left_clicker_block");
   }
 
   @Override
   public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inventory, @Nonnull Player player) {
-    return new BreakerMenu(id, inventory, this);
+    return new LeftClickerMenu(id, inventory, this);
   }
 
   private void breakBlock(Level level, BlockPos pos, FakePlayer fakePlayer, ItemStack tool, boolean shouldDamageTool) {
@@ -152,7 +152,7 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
       fakePlayer = FakePlayerFactory.getMinecraft((ServerLevel) level);
     }
 
-    Direction facing = state.getValue(BreakerBlock.FACING);
+    Direction facing = state.getValue(LeftClickerBlock.FACING);
     BlockPos targetPos = pos.relative(facing);
     BlockState targetState = level.getBlockState(targetPos);
 
@@ -166,7 +166,7 @@ public class BreakerBlockEntity extends BlockEntity implements MenuProvider {
       // Use our cached fake player
       fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, tool.copy());
 
-      // Position the fake player behind the breaker block
+      // Position the fake player behind the left clicker block
       BlockPos playerPos = pos.relative(facing.getOpposite());
       fakePlayer.setPos(playerPos.getX() + 0.5, playerPos.getY() + 0.5, playerPos.getZ() + 0.5);
 

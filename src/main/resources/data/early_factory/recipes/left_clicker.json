@@ -1,19 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": ["WWW", "GPG", "WWW"],
+  "pattern": ["WWW", "GGW", "WWW"],
   "key": {
     "W": {
       "tag": "minecraft:planks"
     },
     "G": {
       "item": "early_factory:gear"
-    },
-    "P": {
-      "item": "minecraft:wooden_pickaxe"
     }
   },
   "result": {
-    "item": "early_factory:breaker",
+    "item": "early_factory:left_clicker",
     "count": 1
   }
 }

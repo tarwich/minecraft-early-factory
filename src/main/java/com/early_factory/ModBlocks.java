@@ -1,6 +1,6 @@
 package com.early_factory;
 
-import com.early_factory.block.BreakerBlock;
+import com.early_factory.block.LeftClickerBlock;
 import com.early_factory.block.CollectorBlock;
 import com.early_factory.block.PlacerBlock;
 
@@ -16,12 +16,13 @@ public class ModBlocks {
   public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS,
       EarlyFactory.MODID);
 
-  // Breaker
-  public static final RegistryObject<Block> BREAKER = BLOCKS.register("breaker",
-      () -> new BreakerBlock());
+  // Left Clicker
+  public static final RegistryObject<Block> LEFT_CLICKER_BLOCK = BLOCKS.register("left_clicker",
+          () -> new LeftClickerBlock());
 
-  public static final RegistryObject<Item> BREAKER_ITEM = ModItems.ITEMS.register("breaker",
-      () -> new BlockItem(BREAKER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+  public static final RegistryObject<Item> LEFT_CLICKER_BLOCK_ITEM = ModItems.ITEMS.register("left_clicker",
+          () -> new BlockItem(LEFT_CLICKER_BLOCK.get(),
+                  new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
   // Placer
   public static final RegistryObject<Block> PLACER = BLOCKS.register("placer", PlacerBlock::new);

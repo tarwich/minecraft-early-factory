@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "early_factory:breaker",
+    "early_factory:left_clicker_block",
     "early_factory:placer",
     "early_factory:collector"
   ]

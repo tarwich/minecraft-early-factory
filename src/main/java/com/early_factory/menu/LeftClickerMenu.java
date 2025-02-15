@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.early_factory.ModBlocks;
 import com.early_factory.ModMenuTypes;
-import com.early_factory.block.entity.BreakerBlockEntity;
+import com.early_factory.block.entity.LeftClickerBlockEntity;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,18 +17,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class BreakerMenu extends AbstractContainerMenu {
-  private final BreakerBlockEntity blockEntity;
+public class LeftClickerMenu extends AbstractContainerMenu {
+  private final LeftClickerBlockEntity blockEntity;
   private final ContainerLevelAccess levelAccess;
 
-  public BreakerMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
+  public LeftClickerMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
     this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()));
   }
 
-  public BreakerMenu(int id, Inventory inv, BlockEntity entity) {
-    super(ModMenuTypes.BREAKER_MENU.get(), id);
+  public LeftClickerMenu(int id, Inventory inv, BlockEntity entity) {
+    super(ModMenuTypes.LEFT_CLICKER_MENU.get(), id);
     checkContainerSize(inv, 1);
-    blockEntity = (BreakerBlockEntity) entity;
+    blockEntity = (LeftClickerBlockEntity) entity;
     Level level = blockEntity.getLevel();
 
     if (level == null) {
@@ -37,7 +37,7 @@ public class BreakerMenu extends AbstractContainerMenu {
 
     this.levelAccess = ContainerLevelAccess.create(level, blockEntity.getBlockPos());
 
-    // Add the breaker slot
+    // Add the tool slot
     addSlot(new SlotItemHandler(blockEntity.getItemHandler(), 0, 80, 35));
 
     // Add player inventory slots
@@ -55,7 +55,7 @@ public class BreakerMenu extends AbstractContainerMenu {
 
   @Override
   public boolean stillValid(@Nonnull Player player) {
-    return stillValid(this.levelAccess, player, ModBlocks.BREAKER.get());
+    return stillValid(this.levelAccess, player, ModBlocks.LEFT_CLICKER_BLOCK.get());
   }
 
   // This is called when a player shift-clicks items
