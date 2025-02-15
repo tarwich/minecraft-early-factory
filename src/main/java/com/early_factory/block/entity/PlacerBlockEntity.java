@@ -102,35 +102,29 @@ public class PlacerBlockEntity extends BlockEntity implements MenuProvider {
     BlockPos targetPos = pos.relative(facing);
     BlockState targetState = level.getBlockState(targetPos);
 
+    // Position the fake player behind the placer block
+    BlockPos playerPos = pos.relative(facing.getOpposite());
+    fakePlayer.setPos(playerPos.getX() + 0.5, playerPos.getY() + 0.5, playerPos.getZ() + 0.5);
+
     ItemStack stack = itemHandler.getStackInSlot(0);
-    if (!stack.isEmpty()) {
-      // Position the fake player behind the placer block
-      BlockPos playerPos = pos.relative(facing.getOpposite());
-      fakePlayer.setPos(playerPos.getX() + 0.5, playerPos.getY() + 0.5, playerPos.getZ() + 0.5);
+    // Set the item in the fake player's hand (empty or not)
+    fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, stack.copy());
 
-      // Set the item in the fake player's hand
-      ItemStack useStack = stack.copy();
-      fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, useStack);
+    // Create hit result for the target position
+    Vec3 targetVec = new Vec3(targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5);
+    BlockHitResult hitResult = new BlockHitResult(targetVec, facing.getOpposite(), targetPos, false);
 
-      // Create hit result for the target position
-      Vec3 targetVec = new Vec3(targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5);
-      BlockHitResult hitResult = new BlockHitResult(targetVec, facing.getOpposite(), targetPos, false);
-
-      // Try to use/place the item
+    if (!targetState.isAir()) {
+      // Try to interact with the block first (like pressing a button)
+      targetState.use(level, fakePlayer, InteractionHand.MAIN_HAND, hitResult);
+    } else if (!stack.isEmpty() && stack.getItem() instanceof BlockItem) {
+      // If we have a block item and the target space is empty, try to place it
       UseOnContext context = new UseOnContext(fakePlayer, InteractionHand.MAIN_HAND, hitResult);
-
-      // If it's a block item and the target space is empty, try to place it
-      if (stack.getItem() instanceof BlockItem && targetState.isAir()) {
-        stack.useOn(context);
-      }
-      // For non-block items (like bonemeal), try to use them on the target block
-      else if (!targetState.isAir()) {
-        stack.useOn(context);
-      }
-
-      // Update the inventory with the potentially used item
-      itemHandler.setStackInSlot(0, fakePlayer.getItemInHand(InteractionHand.MAIN_HAND));
+      stack.useOn(context);
     }
+
+    // Update the inventory with the potentially used item
+    itemHandler.setStackInSlot(0, fakePlayer.getItemInHand(InteractionHand.MAIN_HAND));
   }
 
   public void dropInventory(Level level, BlockPos pos) {

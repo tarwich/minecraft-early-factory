@@ -1,12 +1,23 @@
 {
-  "parent": "block/cube",
-  "textures": {
-    "particle": "early_factory:block/breaker_front",
-    "north": "early_factory:block/breaker_front",
-    "south": "early_factory:block/breaker_side",
-    "east": "early_factory:block/breaker_side",
-    "west": "early_factory:block/breaker_side",
-    "up": "early_factory:block/breaker_top",
-    "down": "early_factory:block/breaker_top"
-  }
+	"credit": "Made with Blockbench",
+	"parent": "block/cube",
+	"textures": {
+		"particle": "early_factory:block/breaker_front",
+		"north": "early_factory:block/breaker_front",
+		"down": "early_factory:block/breaker_top"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#north"},
+				"east": {"uv": [0, 0, 16, 16], "rotation": 90, "texture": "#down"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#missing"},
+				"west": {"uv": [0, 0, 16, 16], "rotation": 270, "texture": "#down"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#down"},
+				"down": {"uv": [0, 0, 16, 16], "rotation": 180, "texture": "#down"}
+			}
+		}
+	]
 }
