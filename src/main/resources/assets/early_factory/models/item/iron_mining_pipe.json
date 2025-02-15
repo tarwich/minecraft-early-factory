@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "early_factory:item/iron_mining_pipe"
+  }
+}

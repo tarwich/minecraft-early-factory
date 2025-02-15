@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["W W", "W W", "W W"],
+  "key": {
+    "W": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "result": {
+    "item": "early_factory:wooden_mining_pipe",
+    "count": 1
+  }
+}

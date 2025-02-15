@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["WWW", "WGW", " G "],
+  "key": {
+    "W": {
+      "tag": "minecraft:planks"
+    },
+    "G": {
+      "item": "early_factory:gear"
+    }
+  },
+  "result": {
+    "item": "early_factory:miner",
+    "count": 1
+  }
+}

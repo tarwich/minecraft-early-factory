@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "early_factory:stone_mining_pipe",
+    "early_factory:wooden_mining_pipe",
+    "early_factory:iron_mining_pipe",
+    "early_factory:diamond_mining_pipe"
+  ]
+}

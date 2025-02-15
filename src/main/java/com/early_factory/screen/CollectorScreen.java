@@ -12,8 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class CollectorScreen extends AbstractContainerScreen<CollectorMenu> {
-  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MODID,
-      "textures/gui/collector.png");
+  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MOD_ID,
+          "textures/gui/collector.png");
 
   public CollectorScreen(CollectorMenu menu, Inventory inventory, Component title) {
     super(menu, inventory, title);

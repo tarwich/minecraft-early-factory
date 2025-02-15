@@ -3,6 +3,7 @@ package com.early_factory;
 import com.early_factory.block.LeftClickerBlock;
 import com.early_factory.block.CollectorBlock;
 import com.early_factory.block.RightClickerBlock;
+import com.early_factory.block.MinerBlock;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -14,7 +15,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModBlocks {
   public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS,
-      EarlyFactory.MODID);
+                  EarlyFactory.MOD_ID);
 
   // Left Clicker
   public static final RegistryObject<Block> LEFT_CLICKER_BLOCK = BLOCKS.register("left_clicker",
@@ -36,5 +37,12 @@ public class ModBlocks {
 
   public static final RegistryObject<Item> COLLECTOR_ITEM = ModItems.ITEMS.register("collector",
       () -> new BlockItem(COLLECTOR.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+
+  // Miner
+  public static final RegistryObject<Block> MINER = BLOCKS.register("miner",
+                  MinerBlock::new);
+
+  public static final RegistryObject<Item> MINER_ITEM = ModItems.ITEMS.register("miner",
+                  () -> new BlockItem(MINER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
 }

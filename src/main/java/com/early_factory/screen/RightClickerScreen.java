@@ -12,8 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class RightClickerScreen extends AbstractContainerScreen<RightClickerMenu> {
-  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MODID,
-      "textures/gui/right_clicker.png");
+  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MOD_ID,
+          "textures/gui/right_clicker.png");
 
   public RightClickerScreen(RightClickerMenu menu, Inventory inventory, Component title) {
     super(menu, inventory, title);

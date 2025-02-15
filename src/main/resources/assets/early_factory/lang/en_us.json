@@ -3,5 +3,10 @@
   "item.early_factory.gear": "Gear",
   "block.early_factory.left_clicker": "Left Clicker",
   "block.early_factory.right_clicker": "Right Clicker",
-  "block.early_factory.collector": "Collector"
+  "block.early_factory.collector": "Collector",
+  "block.early_factory.miner": "Miner",
+  "item.early_factory.wooden_mining_pipe": "Wooden Mining Pipe",
+  "item.early_factory.stone_mining_pipe": "Stone Mining Pipe",
+  "item.early_factory.iron_mining_pipe": "Iron Mining Pipe",
+  "item.early_factory.diamond_mining_pipe": "Diamond Mining Pipe"
 }

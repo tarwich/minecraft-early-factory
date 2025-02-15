@@ -14,8 +14,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class LeftClickerScreen extends AbstractContainerScreen<LeftClickerMenu> {
-  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MODID,
-      "textures/gui/left_clicker.png");
+  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MOD_ID,
+          "textures/gui/left_clicker.png");
 
   public LeftClickerScreen(LeftClickerMenu menu, Inventory inventory, Component title) {
     super(menu, inventory, title);

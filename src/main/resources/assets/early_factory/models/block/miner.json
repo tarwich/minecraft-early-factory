@@ -1,0 +1,26 @@
+{
+  "credit": "Made with Blockbench",
+  "parent": "block/cube",
+  "textures": {
+    "front": "early_factory:block/miner_front",
+    "top": "early_factory:block/miner_top",
+    "bottom": "early_factory:block/miner_bottom",
+    "particle": "early_factory:block/miner_side",
+    "side": "early_factory:block/miner_side",
+    "back": "early_factory:block/miner_back"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": { "uv": [0, 0, 16, 16], "texture": "#front" },
+        "east": { "uv": [0, 0, 16, 16], "texture": "#side" },
+        "south": { "uv": [0, 0, 16, 16], "texture": "#bottom" },
+        "west": { "uv": [0, 0, 16, 16], "texture": "#side" },
+        "up": { "uv": [0, 0, 16, 16], "texture": "#top" },
+        "down": { "uv": [0, 0, 16, 16], "texture": "#back" }
+      }
+    }
+  ]
+}
