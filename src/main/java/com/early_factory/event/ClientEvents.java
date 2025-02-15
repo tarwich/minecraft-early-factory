@@ -4,7 +4,7 @@ import com.early_factory.EarlyFactory;
 import com.early_factory.ModMenuTypes;
 import com.early_factory.screen.LeftClickerScreen;
 import com.early_factory.screen.CollectorScreen;
-import com.early_factory.screen.PlacerScreen;
+import com.early_factory.screen.RightClickerScreen;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
@@ -19,7 +19,7 @@ public class ClientEvents {
     event.enqueueWork(() -> {
       MenuScreens.register(ModMenuTypes.LEFT_CLICKER_MENU.get(), LeftClickerScreen::new);
       MenuScreens.register(ModMenuTypes.COLLECTOR_MENU.get(), CollectorScreen::new);
-      MenuScreens.register(ModMenuTypes.PLACER.get(), PlacerScreen::new);
+      MenuScreens.register(ModMenuTypes.RIGHT_CLICKER_MENU.get(), RightClickerScreen::new);
     });
   }
 }

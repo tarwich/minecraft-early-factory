@@ -3,7 +3,7 @@ package com.early_factory;
 import org.slf4j.Logger;
 
 import com.early_factory.screen.CollectorScreen;
-import com.early_factory.screen.PlacerScreen;
+import com.early_factory.screen.RightClickerScreen;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -104,7 +104,7 @@ public class EarlyFactory {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
-                MenuScreens.register(ModMenuTypes.PLACER.get(), PlacerScreen::new);
+                MenuScreens.register(ModMenuTypes.RIGHT_CLICKER_MENU.get(), RightClickerScreen::new);
                 MenuScreens.register(ModMenuTypes.COLLECTOR_MENU.get(), CollectorScreen::new);
             });
         }

@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "early_factory:block/right_clicker",
+      "x": 90
+    },
+    "facing=up": {
+      "model": "early_factory:block/right_clicker",
+      "x": -90
+    },
+    "facing=north": {
+      "model": "early_factory:block/right_clicker"
+    },
+    "facing=south": {
+      "model": "early_factory:block/right_clicker",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "early_factory:block/right_clicker",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "early_factory:block/right_clicker",
+      "y": 90
+    }
+  }
+}

@@ -2,7 +2,7 @@ package com.early_factory;
 
 import com.early_factory.menu.LeftClickerMenu;
 import com.early_factory.menu.CollectorMenu;
-import com.early_factory.menu.PlacerMenu;
+import com.early_factory.menu.RightClickerMenu;
 
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -17,8 +17,9 @@ public class ModMenuTypes {
   public static final RegistryObject<MenuType<LeftClickerMenu>> LEFT_CLICKER_MENU = MENUS.register("left_clicker_menu",
           () -> IForgeMenuType.create(LeftClickerMenu::new));
 
-  public static final RegistryObject<MenuType<PlacerMenu>> PLACER = MENUS.register("placer",
-      () -> IForgeMenuType.create(PlacerMenu::new));
+  public static final RegistryObject<MenuType<RightClickerMenu>> RIGHT_CLICKER_MENU = MENUS.register(
+          "right_clicker_menu",
+          () -> IForgeMenuType.create(RightClickerMenu::new));
 
   public static final RegistryObject<MenuType<CollectorMenu>> COLLECTOR_MENU = MENUS.register("collector_menu",
       () -> IForgeMenuType.create(CollectorMenu::new));

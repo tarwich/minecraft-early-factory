@@ -1,7 +1,7 @@
 package com.early_factory.screen;
 
 import com.early_factory.EarlyFactory;
-import com.early_factory.menu.PlacerMenu;
+import com.early_factory.menu.RightClickerMenu;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -11,10 +11,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class PlacerScreen extends AbstractContainerScreen<PlacerMenu> {
-  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MODID, "textures/gui/placer.png");
+public class RightClickerScreen extends AbstractContainerScreen<RightClickerMenu> {
+  private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MODID,
+      "textures/gui/right_clicker.png");
 
-  public PlacerScreen(PlacerMenu menu, Inventory inventory, Component title) {
+  public RightClickerScreen(RightClickerMenu menu, Inventory inventory, Component title) {
     super(menu, inventory, title);
   }
 

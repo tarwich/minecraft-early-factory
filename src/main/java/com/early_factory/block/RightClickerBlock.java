@@ -3,7 +3,7 @@ package com.early_factory.block;
 import javax.annotation.Nonnull;
 
 import com.early_factory.ModBlockEntities;
-import com.early_factory.block.entity.PlacerBlockEntity;
+import com.early_factory.block.entity.RightClickerBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,10 +28,10 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 
-public class PlacerBlock extends BaseEntityBlock {
+public class RightClickerBlock extends BaseEntityBlock {
   public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-  public PlacerBlock() {
+  public RightClickerBlock() {
     super(BlockBehaviour.Properties.of(Material.WOOD)
         .strength(3.5f)
         .requiresCorrectToolForDrops());
@@ -59,8 +59,8 @@ public class PlacerBlock extends BaseEntityBlock {
       @Nonnull BlockState newState, boolean isMoving) {
     if (!state.is(newState.getBlock())) {
       BlockEntity blockEntity = level.getBlockEntity(pos);
-      if (blockEntity instanceof PlacerBlockEntity placer) {
-        placer.dropInventory(level, pos);
+      if (blockEntity instanceof RightClickerBlockEntity rightClicker) {
+        rightClicker.dropInventory(level, pos);
       }
     }
     super.onRemove(state, level, pos, newState, isMoving);
@@ -71,8 +71,8 @@ public class PlacerBlock extends BaseEntityBlock {
       @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
     if (!level.isClientSide()) {
       BlockEntity entity = level.getBlockEntity(pos);
-      if (entity instanceof PlacerBlockEntity) {
-        NetworkHooks.openScreen(((ServerPlayer) player), (PlacerBlockEntity) entity, pos);
+      if (entity instanceof RightClickerBlockEntity) {
+        NetworkHooks.openScreen(((ServerPlayer) player), (RightClickerBlockEntity) entity, pos);
         return InteractionResult.CONSUME;
       }
     }
@@ -81,13 +81,13 @@ public class PlacerBlock extends BaseEntityBlock {
 
   @Override
   public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-    return new PlacerBlockEntity(pos, state);
+    return new RightClickerBlockEntity(pos, state);
   }
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state,
       @Nonnull BlockEntityType<T> type) {
-    return createTickerHelper(type, ModBlockEntities.PLACER.get(),
-        (level1, pos, state1, be) -> ((PlacerBlockEntity) be).tick(level1, pos, state1));
+    return createTickerHelper(type, ModBlockEntities.RIGHT_CLICKER.get(),
+        (level1, pos, state1, be) -> ((RightClickerBlockEntity) be).tick(level1, pos, state1));
   }
 }

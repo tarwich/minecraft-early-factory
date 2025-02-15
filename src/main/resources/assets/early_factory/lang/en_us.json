@@ -1,7 +1,7 @@
 {
   "block.early_factory.gear_box": "Gear Box",
   "item.early_factory.gear": "Gear",
-  "block.early_factory.left_clicker_block": "Left Clicker",
-  "block.early_factory.placer": "Placer",
+  "block.early_factory.left_clicker": "Left Clicker",
+  "block.early_factory.right_clicker": "Right Clicker",
   "block.early_factory.collector": "Collector"
 }

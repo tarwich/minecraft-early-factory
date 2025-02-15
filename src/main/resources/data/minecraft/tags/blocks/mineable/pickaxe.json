@@ -2,7 +2,7 @@
   "replace": false,
   "values": [
     "early_factory:left_clicker_block",
-    "early_factory:placer",
+    "early_factory:right_clicker",
     "early_factory:collector"
   ]
 }

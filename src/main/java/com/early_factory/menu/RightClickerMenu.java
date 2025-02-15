@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.early_factory.ModBlocks;
 import com.early_factory.ModMenuTypes;
-import com.early_factory.block.entity.PlacerBlockEntity;
+import com.early_factory.block.entity.RightClickerBlockEntity;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,19 +17,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class PlacerMenu extends AbstractContainerMenu {
-  private final PlacerBlockEntity blockEntity;
+public class RightClickerMenu extends AbstractContainerMenu {
+  private final RightClickerBlockEntity blockEntity;
   private final Level level;
   private final ContainerLevelAccess containerLevelAccess;
 
-  public PlacerMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
+  public RightClickerMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
     this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()));
   }
 
-  public PlacerMenu(int id, Inventory inv, BlockEntity entity) {
-    super(ModMenuTypes.PLACER.get(), id);
+  public RightClickerMenu(int id, Inventory inv, BlockEntity entity) {
+    super(ModMenuTypes.RIGHT_CLICKER_MENU.get(), id);
     checkContainerSize(inv, 1);
-    blockEntity = (PlacerBlockEntity) entity;
+    blockEntity = (RightClickerBlockEntity) entity;
     this.level = inv.player.level;
     this.containerLevelAccess = ContainerLevelAccess.create(level, blockEntity.getBlockPos());
 
@@ -51,7 +51,7 @@ public class PlacerMenu extends AbstractContainerMenu {
 
   @Override
   public boolean stillValid(@Nonnull Player player) {
-    return stillValid(containerLevelAccess, player, ModBlocks.PLACER.get());
+    return stillValid(containerLevelAccess, player, ModBlocks.RIGHT_CLICKER.get());
   }
 
   @Override

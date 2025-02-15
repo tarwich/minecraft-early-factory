@@ -3,8 +3,8 @@ package com.early_factory.block.entity;
 import javax.annotation.Nonnull;
 
 import com.early_factory.ModBlockEntities;
-import com.early_factory.block.PlacerBlock;
-import com.early_factory.menu.PlacerMenu;
+import com.early_factory.block.RightClickerBlock;
+import com.early_factory.menu.RightClickerMenu;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,7 +33,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class PlacerBlockEntity extends BlockEntity implements MenuProvider {
+public class RightClickerBlockEntity extends BlockEntity implements MenuProvider {
   private final ItemStackHandler itemHandler = new ItemStackHandler(1) {
     @Override
     protected void onContentsChanged(int slot) {
@@ -44,8 +44,8 @@ public class PlacerBlockEntity extends BlockEntity implements MenuProvider {
   private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.of(() -> itemHandler);
   private FakePlayer fakePlayer;
 
-  public PlacerBlockEntity(BlockPos pos, BlockState state) {
-    super(ModBlockEntities.PLACER.get(), pos, state);
+  public RightClickerBlockEntity(BlockPos pos, BlockState state) {
+    super(ModBlockEntities.RIGHT_CLICKER.get(), pos, state);
   }
 
   @Override
@@ -80,12 +80,12 @@ public class PlacerBlockEntity extends BlockEntity implements MenuProvider {
 
   @Override
   public Component getDisplayName() {
-    return Component.translatable("block.early_factory.placer");
+    return Component.translatable("block.early_factory.right_clicker");
   }
 
   @Override
   public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inventory, @Nonnull Player player) {
-    return new PlacerMenu(id, inventory, this);
+    return new RightClickerMenu(id, inventory, this);
   }
 
   public void tick(Level level, BlockPos pos, BlockState state) {
@@ -98,11 +98,11 @@ public class PlacerBlockEntity extends BlockEntity implements MenuProvider {
       fakePlayer = FakePlayerFactory.getMinecraft((ServerLevel) level);
     }
 
-    Direction facing = state.getValue(PlacerBlock.FACING);
+    Direction facing = state.getValue(RightClickerBlock.FACING);
     BlockPos targetPos = pos.relative(facing);
     BlockState targetState = level.getBlockState(targetPos);
 
-    // Position the fake player behind the placer block
+    // Position the fake player behind the clicker block
     BlockPos playerPos = pos.relative(facing.getOpposite());
     fakePlayer.setPos(playerPos.getX() + 0.5, playerPos.getY() + 0.5, playerPos.getZ() + 0.5);
 

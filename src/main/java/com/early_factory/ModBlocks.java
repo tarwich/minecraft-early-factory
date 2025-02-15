@@ -2,7 +2,7 @@ package com.early_factory;
 
 import com.early_factory.block.LeftClickerBlock;
 import com.early_factory.block.CollectorBlock;
-import com.early_factory.block.PlacerBlock;
+import com.early_factory.block.RightClickerBlock;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -24,10 +24,11 @@ public class ModBlocks {
           () -> new BlockItem(LEFT_CLICKER_BLOCK.get(),
                   new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
-  // Placer
-  public static final RegistryObject<Block> PLACER = BLOCKS.register("placer", PlacerBlock::new);
-  public static final RegistryObject<Item> PLACER_ITEM = ModItems.ITEMS.register("placer",
-      () -> new BlockItem(PLACER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+  // Right Clicker
+  public static final RegistryObject<Block> RIGHT_CLICKER = BLOCKS.register("right_clicker",
+          RightClickerBlock::new);
+  public static final RegistryObject<Item> RIGHT_CLICKER_ITEM = ModItems.ITEMS.register("right_clicker",
+          () -> new BlockItem(RIGHT_CLICKER.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
   // Collector
   public static final RegistryObject<Block> COLLECTOR = BLOCKS.register("collector",

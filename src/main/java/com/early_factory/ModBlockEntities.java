@@ -2,7 +2,7 @@ package com.early_factory;
 
 import com.early_factory.block.entity.LeftClickerBlockEntity;
 import com.early_factory.block.entity.CollectorBlockEntity;
-import com.early_factory.block.entity.PlacerBlockEntity;
+import com.early_factory.block.entity.RightClickerBlockEntity;
 
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
@@ -18,10 +18,9 @@ public class ModBlockEntities {
                   () -> BlockEntityType.Builder.of(LeftClickerBlockEntity::new,
                           ModBlocks.LEFT_CLICKER_BLOCK.get()).build(null));
 
-  public static final RegistryObject<BlockEntityType<PlacerBlockEntity>> PLACER = BLOCK_ENTITIES.register(
-      "placer",
-      () -> BlockEntityType.Builder.of(PlacerBlockEntity::new,
-          ModBlocks.PLACER.get()).build(null));
+  public static final RegistryObject<BlockEntityType<RightClickerBlockEntity>> RIGHT_CLICKER = BLOCK_ENTITIES
+          .register("right_clicker", () -> BlockEntityType.Builder.of(RightClickerBlockEntity::new,
+                  ModBlocks.RIGHT_CLICKER.get()).build(null));
 
   public static final RegistryObject<BlockEntityType<CollectorBlockEntity>> COLLECTOR = BLOCK_ENTITIES
       .register("collector", () -> BlockEntityType.Builder.of(CollectorBlockEntity::new,
