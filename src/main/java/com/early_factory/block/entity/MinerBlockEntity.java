@@ -129,15 +129,13 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
 
     if (isAdjustingDepth) {
       LOGGER.debug("Adjusting depth from {} to {}", this.depth, possibleDepth);
+      double oldDepth = this.depth;
+
       if (this.depth > possibleDepth) {
         if (this.depth - possibleDepth <= MOVING_SPEED) {
           this.depth = possibleDepth;
         } else {
           this.depth = this.depth - MOVING_SPEED;
-        }
-        setChanged();
-        if (level != null && !level.isClientSide()) {
-          level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
       } else if (this.depth < this.getBlockPos().getY()) {
         if (possibleDepth - this.depth <= MOVING_SPEED) {
@@ -145,21 +143,24 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
         } else {
           this.depth = this.depth + MOVING_SPEED;
         }
-        setChanged();
-        if (level != null && !level.isClientSide()) {
-          level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-        }
+      }
+
+      // Scan whenever the depth changes by at least 1 block
+      if (Math.floor(oldDepth) != Math.floor(this.depth)) {
+        scanBlocks();
+        lastScannedDepth = this.depth;
+      }
+
+      setChanged();
+      if (level != null && !level.isClientSide()) {
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
       }
       return;
     }
 
-    // Only scan if depth has changed
-    if (Math.abs(this.depth - lastScannedDepth) > 0.001) {
-      scanBlocks();
-      lastScannedDepth = this.depth;
-    }
-
-    // Mining logic
+    // Remove the old depth-based scan check since we're now scanning during
+    // movement
+    // Only do mining logic when we're not moving
     if (!scannedBlocks.isEmpty()) {
       miningProgress++;
       if (miningProgress >= MINING_SPEED) {
