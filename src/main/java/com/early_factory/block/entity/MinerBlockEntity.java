@@ -16,7 +16,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -32,6 +31,7 @@ import com.early_factory.block.entity.MinerBlockEntity;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 public class MinerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -62,6 +62,7 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   private static final int DEPTH_PER_PIPE = 10;
   private static final int SCAN_RADIUS = 8; // For 16x16 area (8 blocks in each direction)
   private static final int SCAN_DEPTH = 16;
+  private static final boolean WEIGHTED_MINING = false;
 
   // Replace the scannedBlocks Set with a Map to track quantities
   private final java.util.Map<ResourceLocation, Integer> scannedBlocks = new java.util.HashMap<>();
@@ -135,6 +136,9 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
           this.depth = this.depth - MOVING_SPEED;
         }
         setChanged();
+        if (level != null && !level.isClientSide()) {
+          level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
       } else if (this.depth < this.getBlockPos().getY()) {
         if (possibleDepth - this.depth <= MOVING_SPEED) {
           this.depth = possibleDepth;
@@ -142,6 +146,9 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
           this.depth = this.depth + MOVING_SPEED;
         }
         setChanged();
+        if (level != null && !level.isClientSide()) {
+          level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
       }
       return;
     }
@@ -293,6 +300,7 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   public CompoundTag getUpdateTag() {
     CompoundTag tag = super.getUpdateTag();
     tag.put("inventory", itemHandler.serializeNBT());
+    tag.putDouble("depth", depth);
 
     // Make sure we're including the scanned blocks data
     CompoundTag blocksTag = new CompoundTag();
@@ -311,6 +319,11 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     // Add this line to handle inventory updates
     if (tag.contains("inventory")) {
       itemHandler.deserializeNBT(tag.getCompound("inventory"));
+    }
+
+    // Add this line to handle depth updates
+    if (tag.contains("depth")) {
+      depth = tag.getDouble("depth");
     }
 
     // Clear and reload the scanned blocks
@@ -349,29 +362,44 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     ResourceLocation toolType = net.minecraft.core.Registry.ITEM.getKey(toolStack.getItem());
     int toolLevel = TOOL_MINING_LEVELS.getOrDefault(toolType, 0);
 
-    // Calculate total weight for available blocks we can mine
-    int totalWeight = 0;
-    Map<ResourceLocation, Integer> availableBlocks = new java.util.HashMap<>();
-
-    for (Map.Entry<ResourceLocation, Integer> entry : scannedBlocks.entrySet()) {
-      int blockLevel = BLOCK_MINING_LEVELS.getOrDefault(entry.getKey(), 1);
-      if (blockLevel <= toolLevel) {
-        availableBlocks.put(entry.getKey(), entry.getValue());
-        totalWeight += entry.getValue();
-      }
-    }
-
-    if (totalWeight == 0)
-      return;
-
-    // Random selection weighted by quantity
-    int random = level.getRandom().nextInt(totalWeight);
     ResourceLocation selectedBlock = null;
-    for (Map.Entry<ResourceLocation, Integer> entry : availableBlocks.entrySet()) {
-      random -= entry.getValue();
-      if (random < 0) {
-        selectedBlock = entry.getKey();
-        break;
+
+    if (WEIGHTED_MINING) {
+      // Calculate total weight for available blocks we can mine
+      int totalWeight = 0;
+      Map<ResourceLocation, Integer> availableBlocks = new java.util.HashMap<>();
+
+      for (Map.Entry<ResourceLocation, Integer> entry : scannedBlocks.entrySet()) {
+        int blockLevel = BLOCK_MINING_LEVELS.getOrDefault(entry.getKey(), 1);
+
+        int weight = entry.getValue();
+        if (blockLevel <= toolLevel) {
+          availableBlocks.put(entry.getKey(), weight);
+          totalWeight += weight;
+        }
+      }
+
+      if (totalWeight == 0)
+        return;
+
+      // Random selection weighted by quantity
+      int random = level.getRandom().nextInt(totalWeight);
+      for (Map.Entry<ResourceLocation, Integer> entry : availableBlocks.entrySet()) {
+        random -= entry.getValue();
+        if (random < 0) {
+          selectedBlock = entry.getKey();
+          break;
+        }
+      }
+    } else {
+      // Get list of blocks we can mine with current tool
+      List<ResourceLocation> mineableBlocks = scannedBlocks.keySet().stream()
+          .filter(block -> BLOCK_MINING_LEVELS.getOrDefault(block, 1) <= toolLevel)
+          .collect(java.util.stream.Collectors.toList());
+
+      if (!mineableBlocks.isEmpty()) {
+        // Pick a random block from the filtered list
+        selectedBlock = mineableBlocks.get(level.getRandom().nextInt(mineableBlocks.size()));
       }
     }
 
