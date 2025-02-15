@@ -1,0 +1,33 @@
+{
+  "folders": [
+    {
+      "name": "🏠 Root",
+      "path": ".."
+    },
+    {
+      "name": "📄 Java Sources",
+      "path": "../src/main/java"
+    },
+    {
+      "name": "📁 Resources",
+      "path": "../src/main/resources"
+    }
+  ],
+  "settings": {
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "files.exclude": {
+      "**/bin": true,
+      "**/build": true,
+      "**/.gradle": true
+    },
+    "[java]": {
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true
+    },
+    "[json]": {
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true
+    },
+    "java.compile.nullAnalysis.mode": "disabled"
+  }
+}
