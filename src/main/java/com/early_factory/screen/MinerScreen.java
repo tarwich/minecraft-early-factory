@@ -32,11 +32,11 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
   private float scrollOffset = 0;
   private boolean isScrolling = false;
   private List<ResourceLocation> displayedBlocks = new ArrayList<>();
-  private static final int SCROLL_HEIGHT = 90; // Height of scrollable area
+  private static final int SCROLL_HEIGHT = 54; // Reduced to match 3 rows height
   private static final int ITEMS_PER_ROW = 3;
-  private static final int VISIBLE_ROWS = 5;
+  private static final int VISIBLE_ROWS = 3;
   private static final int ITEM_SPACING = 18; // Space between items
-  private static final int LIST_X = 98; // X position of the list
+  private static final int LIST_X = 106; // X position of the list
   private static final int LIST_Y = 17; // Y position of the list
 
   public MinerScreen(MinerMenu menu, Inventory inventory, Component title) {
@@ -73,8 +73,8 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
 
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
-    if (isScrollBarActive() && mouseX >= leftPos + 166 && mouseX < leftPos + 176
-        && mouseY >= topPos + 17 && mouseY < topPos + 107) {
+    if (isScrollBarActive() && mouseX >= leftPos + 159 && mouseX < leftPos + 171
+        && mouseY >= topPos + 17 && mouseY < topPos + 71) {
       isScrolling = true;
       return true;
     }
@@ -85,7 +85,7 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
   public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
     if (isScrolling) {
       int maxScroll = ((displayedBlocks.size() + ITEMS_PER_ROW - 1) / ITEMS_PER_ROW - VISIBLE_ROWS);
-      float dragAmount = (float) (mouseY - (topPos + 17)) / SCROLL_HEIGHT;
+      float dragAmount = (float) (mouseY - (topPos + 17)) / (54.0f - 15);
       scrollOffset = Math.max(0, Math.min(maxScroll, dragAmount * maxScroll));
       return true;
     }
@@ -114,10 +114,10 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
 
     // Draw scroll bar
     if (isScrollBarActive()) {
-      float scrollBarHeight = 90;
+      float scrollBarHeight = 54;
       int maxScroll = ((displayedBlocks.size() + ITEMS_PER_ROW - 1) / ITEMS_PER_ROW - VISIBLE_ROWS);
-      float scrollBarY = topPos + 17 + (scrollBarHeight * (scrollOffset / maxScroll));
-      blit(pPoseStack, leftPos + 166, (int) scrollBarY, 176, 0, 10, 15);
+      float scrollBarY = topPos + 17 + ((scrollBarHeight - 15) * (scrollOffset / maxScroll));
+      blit(pPoseStack, leftPos + 159, (int) scrollBarY, 178, 0, 12, 15);
     }
 
     // Draw items
