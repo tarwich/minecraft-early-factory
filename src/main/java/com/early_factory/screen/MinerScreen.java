@@ -57,7 +57,15 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
     if (blockEntity instanceof MinerBlockEntity) {
       MinerBlockEntity miner = (MinerBlockEntity) blockEntity;
       Map<ResourceLocation, Integer> scannedBlocks = miner.getScannedBlocks();
-      displayedBlocks.addAll(scannedBlocks.keySet());
+
+      // Convert to list of entries and sort by quantity in descending order
+      List<Map.Entry<ResourceLocation, Integer>> sortedEntries = new ArrayList<>(scannedBlocks.entrySet());
+      sortedEntries.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+      // Add sorted blocks to displayedBlocks
+      for (Map.Entry<ResourceLocation, Integer> entry : sortedEntries) {
+        displayedBlocks.add(entry.getKey());
+      }
     }
   }
 
@@ -104,6 +112,9 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
 
   @Override
   protected void renderBg(@Nonnull PoseStack pPoseStack, float pPartialTick, int pMouseX, int pMouseY) {
+    // Update the displayed blocks each render frame
+    updateDisplayedBlocks();
+
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.setShaderTexture(0, TEXTURE);
