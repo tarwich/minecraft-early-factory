@@ -169,9 +169,9 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
 
     MinerBlockEntity blockEntity = menu.getBlockEntity();
     if (blockEntity != null) {
-      double depth = blockEntity.getDepth();
-      String depthText = "Depth: " + DEPTH_FORMAT.format(blockEntity.getBlockPos().getY() - depth);
-      font.draw(poseStack, depthText, 10, 20, GREEN_COLOR);
+      int yLevel = blockEntity.getCurrentYLevel();
+      String yLevelText = "Y-Level: " + DEPTH_FORMAT.format(yLevel);
+      font.draw(poseStack, yLevelText, 10, 20, GREEN_COLOR);
     }
 
     // Add tooltips for items

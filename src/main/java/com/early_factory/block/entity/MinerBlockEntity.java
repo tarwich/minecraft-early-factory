@@ -56,11 +56,12 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   };
 
   private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
-  private double depth;
+  private int currentYLevel;
+  private double yLevelProgress;
   private ItemStack previousStack = ItemStack.EMPTY;
-  private static final double MOVING_SPEED = 0.25D;
+  private static final double MOVING_SPEED = 0.1D;
   private static final int DEPTH_PER_PIPE = 10;
-  private static final int SCAN_RADIUS = 8; // For 16x16 area (8 blocks in each direction)
+  private static final int SCAN_RADIUS = 8;
   private static final int SCAN_DEPTH = 16;
   private static final boolean WEIGHTED_MINING = false;
 
@@ -110,45 +111,45 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   public MinerBlockEntity(BlockPos pos, BlockState state) {
     super(ModBlockEntities.MINER.get(), pos, state);
     resetDepth();
-    lastScannedDepth = depth;
+    lastScannedDepth = currentYLevel;
   }
 
   private void resetDepth() {
-    this.depth = this.getBlockPos().getY();
+    this.currentYLevel = this.getBlockPos().getY();
   }
 
-  private double getPossibleDepth() {
+  private int getTargetYLevel() {
     ItemStack stack = itemHandler.getStackInSlot(0);
     int pipeCount = stack.getCount();
     return this.getBlockPos().getY() - (pipeCount * DEPTH_PER_PIPE);
   }
 
   public void tickServer() {
-    double possibleDepth = getPossibleDepth();
-    boolean isAdjustingDepth = Math.abs(this.depth - possibleDepth) > 0.001;
+    int targetYLevel = getTargetYLevel();
+    boolean isAdjustingLevel = this.currentYLevel != targetYLevel;
 
-    if (isAdjustingDepth) {
-      LOGGER.debug("Adjusting depth from {} to {}", this.depth, possibleDepth);
-      double oldDepth = this.depth;
+    if (isAdjustingLevel) {
+      LOGGER.debug("Adjusting Y-level from {} to {}", this.currentYLevel, targetYLevel);
+      int oldYLevel = this.currentYLevel;
 
-      if (this.depth > possibleDepth) {
-        if (this.depth - possibleDepth <= MOVING_SPEED) {
-          this.depth = possibleDepth;
-        } else {
-          this.depth = this.depth - MOVING_SPEED;
+      if (this.currentYLevel > targetYLevel) {
+        yLevelProgress -= MOVING_SPEED;
+        if (yLevelProgress <= -1.0) {
+          this.currentYLevel--;
+          yLevelProgress += 1.0;
         }
-      } else if (this.depth < this.getBlockPos().getY()) {
-        if (possibleDepth - this.depth <= MOVING_SPEED) {
-          this.depth = possibleDepth;
-        } else {
-          this.depth = this.depth + MOVING_SPEED;
+      } else if (this.currentYLevel < this.getBlockPos().getY()) {
+        yLevelProgress += MOVING_SPEED;
+        if (yLevelProgress >= 1.0) {
+          this.currentYLevel++;
+          yLevelProgress -= 1.0;
         }
       }
 
-      // Scan whenever the depth changes by at least 1 block
-      if (Math.floor(oldDepth) != Math.floor(this.depth)) {
+      // Scan whenever the y-level changes
+      if (oldYLevel != this.currentYLevel) {
         scanBlocks();
-        lastScannedDepth = this.depth;
+        lastScannedDepth = this.currentYLevel;
       }
 
       setChanged();
@@ -175,13 +176,13 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     if (level == null)
       return;
 
-    LOGGER.debug("Starting scan at depth: {}", depth);
+    LOGGER.debug("Starting scan at Y-level: {}", currentYLevel);
     scannedBlocks.clear();
     BlockPos minerPos = this.getBlockPos();
-    int currentDepth = (int) this.depth;
+    int currentY = this.currentYLevel;
 
     int blocksFound = 0; // For debug
-    for (int y = currentDepth; y > currentDepth - SCAN_DEPTH && y > level.getMinBuildHeight(); y--) {
+    for (int y = currentY; y > currentY - SCAN_DEPTH && y > level.getMinBuildHeight(); y--) {
       for (int x = -SCAN_RADIUS; x <= SCAN_RADIUS; x++) {
         for (int z = -SCAN_RADIUS; z <= SCAN_RADIUS; z++) {
           BlockPos pos = new BlockPos(minerPos.getX() + x, y, minerPos.getZ() + z);
@@ -248,7 +249,7 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   @Override
   protected void saveAdditional(CompoundTag tag) {
     tag.put("inventory", itemHandler.serializeNBT());
-    tag.putDouble("depth", depth);
+    tag.putInt("currentYLevel", currentYLevel);
     tag.putDouble("lastScannedDepth", lastScannedDepth);
 
     // Save scanned blocks
@@ -265,7 +266,7 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   public void load(CompoundTag tag) {
     super.load(tag);
     itemHandler.deserializeNBT(tag.getCompound("inventory"));
-    depth = tag.getDouble("depth");
+    currentYLevel = tag.getInt("currentYLevel");
     lastScannedDepth = tag.getDouble("lastScannedDepth");
 
     // Load scanned blocks
@@ -293,15 +294,15 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     super.setChanged();
   }
 
-  public double getDepth() {
-    return depth;
+  public int getCurrentYLevel() {
+    return currentYLevel;
   }
 
   @Override
   public CompoundTag getUpdateTag() {
     CompoundTag tag = super.getUpdateTag();
     tag.put("inventory", itemHandler.serializeNBT());
-    tag.putDouble("depth", depth);
+    tag.putInt("currentYLevel", currentYLevel);
 
     // Make sure we're including the scanned blocks data
     CompoundTag blocksTag = new CompoundTag();
@@ -317,14 +318,12 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   public void handleUpdateTag(CompoundTag tag) {
     super.handleUpdateTag(tag);
 
-    // Add this line to handle inventory updates
     if (tag.contains("inventory")) {
       itemHandler.deserializeNBT(tag.getCompound("inventory"));
     }
 
-    // Add this line to handle depth updates
-    if (tag.contains("depth")) {
-      depth = tag.getDouble("depth");
+    if (tag.contains("currentYLevel")) {
+      currentYLevel = tag.getInt("currentYLevel");
     }
 
     // Clear and reload the scanned blocks
