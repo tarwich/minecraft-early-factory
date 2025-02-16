@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.early_factory.util.MiningTiers;
+
 public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
   private static final ResourceLocation TEXTURE = new ResourceLocation(EarlyFactory.MOD_ID,
       "textures/gui/miner_gui.png");
@@ -38,6 +40,8 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
   private static final int ITEM_SPACING = 18; // Space between items
   private static final int LIST_X = 106; // X position of the list
   private static final int LIST_Y = 17; // Y position of the list
+  private static final int MINEABLE_BORDER_COLOR = 0xFF00FF00; // Green border
+  private static final int UNMINEABLE_OVERLAY_COLOR = 0x80FF0000; // Semi-transparent red
 
   public MinerScreen(MinerMenu menu, Inventory inventory, Component title) {
     super(menu, inventory, title);
@@ -135,6 +139,9 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
     int firstRow = (int) scrollOffset;
     int lastRow = Math.min(firstRow + VISIBLE_ROWS, (displayedBlocks.size() + ITEMS_PER_ROW - 1) / ITEMS_PER_ROW);
 
+    // Get pipe stack before the loop
+    ItemStack pipeStack = menu.getSlot(MinerMenu.PIPE_SLOT_INDEX).getItem();
+
     for (int row = firstRow; row < lastRow; row++) {
       for (int col = 0; col < ITEMS_PER_ROW; col++) {
         int index = row * ITEMS_PER_ROW + col;
@@ -146,7 +153,23 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
           int itemX = leftPos + LIST_X + col * ITEM_SPACING;
           int itemY = topPos + LIST_Y + (row - firstRow) * ITEM_SPACING;
 
+          // Render the item
           itemRenderer.renderGuiItem(stack, itemX, itemY);
+
+          // Draw mineable indicator
+          boolean canMine = canMineBlock(block, pipeStack);
+          if (!pipeStack.isEmpty()) {
+            if (canMine) {
+              // Draw green border around mineable items
+              fill(pPoseStack, itemX - 1, itemY - 1, itemX + 17, itemY, MINEABLE_BORDER_COLOR); // Top
+              fill(pPoseStack, itemX - 1, itemY + 16, itemX + 17, itemY + 17, MINEABLE_BORDER_COLOR); // Bottom
+              fill(pPoseStack, itemX - 1, itemY, itemX, itemY + 16, MINEABLE_BORDER_COLOR); // Left
+              fill(pPoseStack, itemX + 16, itemY, itemX + 17, itemY + 16, MINEABLE_BORDER_COLOR); // Right
+            } else {
+              // Draw red overlay on unmineable items
+              fill(pPoseStack, itemX, itemY, itemX + 16, itemY + 16, UNMINEABLE_OVERLAY_COLOR);
+            }
+          }
 
           // Draw quantity with new formatting
           BlockEntity blockEntity = menu.getBlockEntity();
@@ -164,7 +187,6 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
     }
 
     // Get pipe item from slot and current Y level
-    ItemStack pipeStack = menu.getSlot(MinerMenu.PIPE_SLOT_INDEX).getItem();
     ItemStack pickaxe = getPickaxeForLevel(pipeStack);
 
     // Render pickaxe icon
@@ -236,5 +258,27 @@ public class MinerScreen extends AbstractContainerScreen<MinerMenu> {
       return String.valueOf(quantity);
     }
     return String.format("%.1fk", quantity / 1000.0);
+  }
+
+  private boolean canMineBlock(Block block, ItemStack pipeStack) {
+    return MiningTiers.canMineBlock(block, pipeStack);
+  }
+
+  private int getBlockHardnessTier(Block block) {
+    String blockId = Registry.BLOCK.getKey(block).toString();
+    // Diamond-tier blocks
+    if (blockId.contains("obsidian") || blockId.contains("diamond") ||
+        blockId.contains("ancient_debris"))
+      return 4;
+    // Iron-tier blocks
+    if (blockId.contains("gold") || blockId.contains("iron") ||
+        blockId.contains("emerald") || blockId.contains("lapis"))
+      return 3;
+    // Stone-tier blocks
+    if (blockId.contains("stone") || blockId.contains("copper") ||
+        blockId.contains("coal"))
+      return 2;
+    // Wooden-tier blocks (dirt, gravel, sand etc)
+    return 1;
   }
 }

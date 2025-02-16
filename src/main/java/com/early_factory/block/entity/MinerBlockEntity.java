@@ -8,6 +8,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
 import com.early_factory.ModBlockEntities;
 import com.early_factory.menu.MinerMenu;
 import com.early_factory.block.entity.MinerBlockEntity;
+import com.early_factory.util.MiningTiers;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,48 +72,10 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
 
   private static final int MINING_SPEED = 20; // 1 seconds (20 ticks per second)
   private int miningProgress = 0;
-  private static final Map<ResourceLocation, Integer> TOOL_MINING_LEVELS = new java.util.HashMap<>();
-
-  static {
-    TOOL_MINING_LEVELS.put(new ResourceLocation("early_factory", "wooden_mining_pipe"), 0); // Wood level
-    TOOL_MINING_LEVELS.put(new ResourceLocation("early_factory", "stone_mining_pipe"), 1); // Stone level
-    TOOL_MINING_LEVELS.put(new ResourceLocation("early_factory", "iron_mining_pipe"), 2); // Iron level
-    TOOL_MINING_LEVELS.put(new ResourceLocation("early_factory", "diamond_mining_pipe"), 3); // Diamond level
-  }
-
-  private static final Map<ResourceLocation, Integer> BLOCK_MINING_LEVELS = new java.util.HashMap<>();
-
-  static {
-    // Level 0 (Wood)
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "dirt"), 0);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "grass_block"), 0);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "sand"), 0);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "gravel"), 0);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "stone"), 0);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "coal_ore"), 0);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "redstone_ore"), 3);
-
-    // Level 1 (Stone)
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "iron_ore"), 2);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "copper_ore"), 2);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "lapis_ore"), 2);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "gold_ore"), 2);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "redstone_ore"), 2);
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "emerald_ore"), 2);
-
-    // Level 2 (Iron)
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "diamond_ore"), 3);
-
-    // Level 3 (Diamond)
-    BLOCK_MINING_LEVELS.put(new ResourceLocation("minecraft", "obsidian"), 3);
-  }
-
-  private double lastScannedDepth;
 
   public MinerBlockEntity(BlockPos pos, BlockState state) {
     super(ModBlockEntities.MINER.get(), pos, state);
     resetDepth();
-    lastScannedDepth = currentYLevel;
   }
 
   private void resetDepth() {
@@ -149,7 +113,6 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
       // Scan whenever the y-level changes
       if (oldYLevel != this.currentYLevel) {
         scanBlocks();
-        lastScannedDepth = this.currentYLevel;
       }
 
       setChanged();
@@ -201,26 +164,7 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   }
 
   private boolean isValidBlock(BlockState state) {
-    if (state.getFluidState().isEmpty()) {
-      net.minecraft.world.level.block.Block block = state.getBlock();
-
-      // Check if the block is a valid mineable type
-      return block instanceof net.minecraft.world.level.block.GravelBlock ||
-          block instanceof net.minecraft.world.level.block.SandBlock ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.BASE_STONE_OVERWORLD) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.BASE_STONE_NETHER) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.DIRT) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.COAL_ORES) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.IRON_ORES) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.GOLD_ORES) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.DIAMOND_ORES) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.REDSTONE_ORES) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.LAPIS_ORES) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.EMERALD_ORES) ||
-          block.defaultBlockState().is(net.minecraft.tags.BlockTags.COPPER_ORES) ||
-          block instanceof net.minecraft.world.level.block.GrassBlock;
-    }
-    return false;
+    return MiningTiers.isValidBlock(state);
   }
 
   @Override
@@ -250,7 +194,6 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   protected void saveAdditional(CompoundTag tag) {
     tag.put("inventory", itemHandler.serializeNBT());
     tag.putInt("currentYLevel", currentYLevel);
-    tag.putDouble("lastScannedDepth", lastScannedDepth);
 
     // Save scanned blocks
     CompoundTag blocksTag = new CompoundTag();
@@ -267,7 +210,6 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     super.load(tag);
     itemHandler.deserializeNBT(tag.getCompound("inventory"));
     currentYLevel = tag.getInt("currentYLevel");
-    lastScannedDepth = tag.getDouble("lastScannedDepth");
 
     // Load scanned blocks
     scannedBlocks.clear();
@@ -354,13 +296,9 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     if (level == null || scannedBlocks.isEmpty())
       return;
 
-    // Get the current tool's mining level
     ItemStack toolStack = itemHandler.getStackInSlot(0);
     if (toolStack.isEmpty())
       return;
-
-    ResourceLocation toolType = net.minecraft.core.Registry.ITEM.getKey(toolStack.getItem());
-    int toolLevel = TOOL_MINING_LEVELS.getOrDefault(toolType, 0);
 
     ResourceLocation selectedBlock = null;
 
@@ -370,12 +308,10 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
       Map<ResourceLocation, Integer> availableBlocks = new java.util.HashMap<>();
 
       for (Map.Entry<ResourceLocation, Integer> entry : scannedBlocks.entrySet()) {
-        int blockLevel = BLOCK_MINING_LEVELS.getOrDefault(entry.getKey(), 1);
-
-        int weight = entry.getValue();
-        if (blockLevel <= toolLevel) {
-          availableBlocks.put(entry.getKey(), weight);
-          totalWeight += weight;
+        Block block = net.minecraft.core.Registry.BLOCK.get(entry.getKey());
+        if (MiningTiers.canMineBlock(block, toolStack)) {
+          availableBlocks.put(entry.getKey(), entry.getValue());
+          totalWeight += entry.getValue();
         }
       }
 
@@ -394,7 +330,9 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     } else {
       // Get list of blocks we can mine with current tool
       List<ResourceLocation> mineableBlocks = scannedBlocks.keySet().stream()
-          .filter(block -> BLOCK_MINING_LEVELS.getOrDefault(block, 1) <= toolLevel)
+          .filter(blockId -> MiningTiers.canMineBlock(
+              net.minecraft.core.Registry.BLOCK.get(blockId),
+              toolStack))
           .collect(java.util.stream.Collectors.toList());
 
       if (!mineableBlocks.isEmpty()) {
@@ -407,7 +345,7 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
       return;
 
     // Create the block item
-    net.minecraft.world.level.block.Block block = net.minecraft.core.Registry.BLOCK.get(selectedBlock);
+    Block block = net.minecraft.core.Registry.BLOCK.get(selectedBlock);
     ItemStack minedStack = new ItemStack(block.asItem());
 
     // Try to insert into adjacent inventory
