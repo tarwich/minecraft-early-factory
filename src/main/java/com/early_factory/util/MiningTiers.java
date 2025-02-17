@@ -1,17 +1,16 @@
 package com.early_factory.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.level.block.Blocks;
-
-import java.util.Map;
-import java.util.HashMap;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.Tags;
 
 public class MiningTiers {
   private static final Map<ResourceLocation, Integer> TOOL_MINING_LEVELS = new HashMap<>();
@@ -72,14 +71,7 @@ public class MiningTiers {
           block.defaultBlockState().is(BlockTags.BASE_STONE_OVERWORLD) ||
           block.defaultBlockState().is(BlockTags.BASE_STONE_NETHER) ||
           block.defaultBlockState().is(BlockTags.DIRT) ||
-          block.defaultBlockState().is(BlockTags.COAL_ORES) ||
-          block.defaultBlockState().is(BlockTags.IRON_ORES) ||
-          block.defaultBlockState().is(BlockTags.GOLD_ORES) ||
-          block.defaultBlockState().is(BlockTags.DIAMOND_ORES) ||
-          block.defaultBlockState().is(BlockTags.REDSTONE_ORES) ||
-          block.defaultBlockState().is(BlockTags.LAPIS_ORES) ||
-          block.defaultBlockState().is(BlockTags.EMERALD_ORES) ||
-          block.defaultBlockState().is(BlockTags.COPPER_ORES) ||
+          block.defaultBlockState().is(Tags.Blocks.ORES) ||
           block instanceof net.minecraft.world.level.block.GrassBlock;
     }
     return false;

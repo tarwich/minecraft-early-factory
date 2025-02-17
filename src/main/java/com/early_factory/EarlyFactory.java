@@ -3,18 +3,13 @@ package com.early_factory;
 import org.slf4j.Logger;
 
 import com.early_factory.screen.CollectorScreen;
+import com.early_factory.screen.LeftClickerScreen;
 import com.early_factory.screen.MinerScreen;
 import com.early_factory.screen.RightClickerScreen;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -27,7 +22,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(EarlyFactory.MOD_ID)
@@ -35,27 +29,6 @@ public class EarlyFactory {
     public static final String MOD_ID = "early_factory";
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
-
-    // Creates a new Block with the id "examplemod:example_block", combining the
-    // namespace and path
-    public static final RegistryObject<Block> EXAMPLE_BLOCK = ModBlocks.BLOCKS.register("example_block",
-            () -> new Block(BlockBehaviour.Properties.of(Material.STONE)));
-    // Creates a new BlockItem with the id "examplemod:example_block", combining the
-    // namespace and path
-    public static final RegistryObject<Item> EXAMPLE_BLOCK_ITEM = ModItems.ITEMS.register("example_block",
-            () -> new BlockItem(EXAMPLE_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
-    public static final RegistryObject<Item> GEAR_ITEM = ModItems.ITEMS.register("gear",
-            () -> new Item(
-                    new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS).tab(CreativeModeTab.TAB_MATERIALS)));
-
-    // Add this new block registration
-    public static final RegistryObject<Block> GEAR_BOX = ModBlocks.BLOCKS.register("gear_box",
-            () -> new Block(BlockBehaviour.Properties.of(Material.METAL)
-                    .strength(3.5F)
-                    .requiresCorrectToolForDrops()));
-
-    public static final RegistryObject<Item> GEAR_BOX_ITEM = ModItems.ITEMS.register("gear_box",
-            () -> new BlockItem(GEAR_BOX.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
     public EarlyFactory() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -114,9 +87,11 @@ public class EarlyFactory {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
+                MenuScreens.register(ModMenuTypes.LEFT_CLICKER_MENU.get(), LeftClickerScreen::new);
                 MenuScreens.register(ModMenuTypes.RIGHT_CLICKER_MENU.get(), RightClickerScreen::new);
                 MenuScreens.register(ModMenuTypes.COLLECTOR_MENU.get(), CollectorScreen::new);
             });
         }
     }
+
 }

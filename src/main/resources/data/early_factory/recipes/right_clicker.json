@@ -1,12 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": ["WWW", "WGG", "WWW"],
+  "pattern": ["WWW", "GSS", "WWW"],
   "key": {
     "W": {
       "tag": "minecraft:planks"
     },
     "G": {
       "item": "early_factory:gear"
+    },
+    "S": {
+      "item": "minecraft:stick"
     }
   },
   "result": {

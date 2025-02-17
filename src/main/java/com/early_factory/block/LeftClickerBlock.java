@@ -13,44 +13,70 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 
-public class LeftClickerBlock extends DirectionalBlock implements EntityBlock {
-  public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
+public class LeftClickerBlock extends BaseEntityBlock {
+  public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
   public LeftClickerBlock() {
     super(BlockBehaviour.Properties.of(Material.WOOD)
         .strength(3.5f)
         .requiresCorrectToolForDrops());
-
-    // Set default facing direction
-    this.registerDefaultState(this.stateDefinition.any()
-        .setValue(FACING, Direction.NORTH));
+    this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
   }
 
   @Override
   protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
-    super.createBlockStateDefinition(builder);
     builder.add(FACING);
   }
 
   @Override
   public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
-    // Get the opposite of the direction the player is looking at
-    // This makes the block face away from the player
     return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
+  }
+
+  @Override
+  public RenderShape getRenderShape(@Nonnull BlockState state) {
+    return RenderShape.MODEL;
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+      @Nonnull BlockState newState, boolean isMoving) {
+    if (!state.is(newState.getBlock())) {
+      BlockEntity blockEntity = level.getBlockEntity(pos);
+      if (blockEntity instanceof LeftClickerBlockEntity leftClicker) {
+        leftClicker.dropInventory(level, pos);
+      }
+    }
+    super.onRemove(state, level, pos, newState, isMoving);
+  }
+
+  @Override
+  public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+      @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
+    if (!level.isClientSide()) {
+      BlockEntity entity = level.getBlockEntity(pos);
+      if (entity instanceof LeftClickerBlockEntity) {
+        NetworkHooks.openScreen(((ServerPlayer) player), (LeftClickerBlockEntity) entity, pos);
+        return InteractionResult.CONSUME;
+      }
+    }
+    return InteractionResult.sidedSuccess(level.isClientSide());
   }
 
   @Override
@@ -59,44 +85,9 @@ public class LeftClickerBlock extends DirectionalBlock implements EntityBlock {
   }
 
   @Override
-  public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
-      @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
-    if (!level.isClientSide()) {
-      BlockEntity be = level.getBlockEntity(pos);
-      if (be instanceof LeftClickerBlockEntity) {
-        NetworkHooks.openScreen((ServerPlayer) player, (LeftClickerBlockEntity) be, pos);
-        return InteractionResult.sidedSuccess(true);
-      }
-    }
-    return InteractionResult.sidedSuccess(level.isClientSide());
-  }
-
-  @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state,
-      @Nonnull BlockEntityType<T> blockEntityType) {
-    return level.isClientSide ? null
-        : createTickerHelper(blockEntityType, ModBlockEntities.LEFT_CLICKER.get(),
-            (level1, pos, state1, blockEntity) -> {
-              // Minecraft runs at 20 ticks per second, so waiting 10 ticks = 0.5 seconds
-              if (level1.getGameTime() % 10 == 0) {
-                ((LeftClickerBlockEntity) blockEntity).tick(level1, pos, state1);
-              }
-            });
-  }
-
-  private static <T extends BlockEntity> BlockEntityTicker<T> createTickerHelper(BlockEntityType<T> actualType,
-      BlockEntityType<?> expectedType, BlockEntityTicker<? super BlockEntity> ticker) {
-    return expectedType == actualType ? (BlockEntityTicker<T>) ticker : null;
-  }
-
-  @Override
-  public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-    if (!state.is(newState.getBlock())) {
-      BlockEntity blockEntity = level.getBlockEntity(pos);
-      if (blockEntity instanceof LeftClickerBlockEntity leftClicker) {
-        leftClicker.dropInventory(level, pos);
-      }
-    }
-    super.onRemove(state, level, pos, newState, isMoving);
+      @Nonnull BlockEntityType<T> type) {
+    return createTickerHelper(type, ModBlockEntities.LEFT_CLICKER.get(),
+        (level1, pos, state1, be) -> ((LeftClickerBlockEntity) be).tick(level1, pos, state1));
   }
 }
