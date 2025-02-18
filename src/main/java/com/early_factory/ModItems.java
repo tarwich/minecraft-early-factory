@@ -41,4 +41,8 @@ public class ModItems {
 
   public static final RegistryObject<Item> DIAMOND_MINING_PIPE = ITEMS.register("diamond_mining_pipe",
       () -> new MiningPipeItem(new Item.Properties()));
+
+  public static final RegistryObject<Item> PIPE_ITEM = ITEMS.register("pipe",
+          () -> new BlockItem(ModBlocks.PIPE.get(),
+                  new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 }
