@@ -2,10 +2,14 @@ package com.early_factory.block;
 
 import javax.annotation.Nonnull;
 
+import com.early_factory.pipe.NetworkManager;
+import com.early_factory.pipe.NetworkManagerProvider;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -109,5 +113,30 @@ public class PipeBlock extends Block {
       shape = Shapes.or(shape, DOWN_SHAPE);
 
     return shape;
+  }
+
+  @Override
+  public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+      @Nonnull BlockState oldState, boolean isMoving) {
+    if (!level.isClientSide && oldState.getBlock() != this) {
+      // Get NetworkManager (you'll need to store/access this somewhere)
+      NetworkManager networkManager = getNetworkManager(level);
+      networkManager.onPipePlaced(pos);
+    }
+  }
+
+  @Override
+  public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+      @Nonnull BlockState newState, boolean isMoving) {
+    if (!level.isClientSide && newState.getBlock() != this) {
+      NetworkManager networkManager = getNetworkManager(level);
+      networkManager.onPipeRemoved(pos);
+    }
+    super.onRemove(state, level, pos, newState, isMoving);
+  }
+
+  // You'll need to implement this method to access your NetworkManager instance
+  private NetworkManager getNetworkManager(Level level) {
+    return NetworkManagerProvider.get(level);
   }
 }

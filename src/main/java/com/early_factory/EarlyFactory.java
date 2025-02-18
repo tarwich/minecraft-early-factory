@@ -2,6 +2,7 @@ package com.early_factory;
 
 import org.slf4j.Logger;
 
+import com.early_factory.pipe.NetworkManagerProvider;
 import com.early_factory.screen.CollectorScreen;
 import com.early_factory.screen.LeftClickerScreen;
 import com.early_factory.screen.MinerScreen;
@@ -9,9 +10,11 @@ import com.early_factory.screen.RightClickerScreen;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -53,6 +56,9 @@ public class EarlyFactory {
 
         // Register the client-side screen
         eventBus.addListener(this::clientSetup);
+
+        // Register level unload listener
+        MinecraftForge.EVENT_BUS.addListener(this::onLevelUnload);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -94,4 +100,9 @@ public class EarlyFactory {
         }
     }
 
+    private void onLevelUnload(LevelEvent.Unload event) {
+        if (event.getLevel() instanceof Level level) {
+            NetworkManagerProvider.remove(level);
+        }
+    }
 }
