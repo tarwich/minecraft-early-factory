@@ -1,14 +1,33 @@
 package com.early_factory.block.entity;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.early_factory.ModBlockEntities;
+import com.early_factory.menu.MinerMenu;
+import com.early_factory.util.MiningTiers;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -16,24 +35,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.early_factory.ModBlockEntities;
-import com.early_factory.menu.MinerMenu;
-import com.early_factory.block.entity.MinerBlockEntity;
-import com.early_factory.util.MiningTiers;
-
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.List;
 
 public class MinerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -164,6 +165,15 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
   }
 
   private boolean isValidBlock(BlockState state) {
+    Block block = state.getBlock();
+
+    // Convert stone to cobblestone and grass to dirt
+    if (block == Blocks.STONE) {
+      return MiningTiers.isValidBlock(Blocks.COBBLESTONE.defaultBlockState());
+    } else if (block == Blocks.GRASS_BLOCK) {
+      return MiningTiers.isValidBlock(Blocks.DIRT.defaultBlockState());
+    }
+
     return MiningTiers.isValidBlock(state);
   }
 
@@ -344,9 +354,17 @@ public class MinerBlockEntity extends BlockEntity implements MenuProvider {
     if (selectedBlock == null)
       return;
 
-    // Create the block item
+    // Create the block item with conversions
     Block block = net.minecraft.core.Registry.BLOCK.get(selectedBlock);
-    ItemStack minedStack = new ItemStack(block.asItem());
+    ItemStack minedStack;
+
+    if (block == net.minecraft.world.level.block.Blocks.STONE) {
+      minedStack = new ItemStack(net.minecraft.world.level.block.Blocks.COBBLESTONE);
+    } else if (block == net.minecraft.world.level.block.Blocks.GRASS_BLOCK) {
+      minedStack = new ItemStack(net.minecraft.world.level.block.Blocks.DIRT);
+    } else {
+      minedStack = new ItemStack(block.asItem());
+    }
 
     // Try to insert into adjacent inventory
     for (Direction direction : Direction.values()) {
