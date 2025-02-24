@@ -88,7 +88,7 @@ public class NetworkManager {
     }
   }
 
-  private PipeNetwork findNetworkForPipe(BlockPos pos) {
+  public PipeNetwork findNetworkForPipe(BlockPos pos) {
     for (PipeNetwork network : networks) {
       if (network.getPipes().contains(pos)) {
         return network;

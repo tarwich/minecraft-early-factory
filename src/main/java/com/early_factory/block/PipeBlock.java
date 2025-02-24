@@ -4,9 +4,17 @@ import javax.annotation.Nonnull;
 
 import com.early_factory.pipe.NetworkManager;
 import com.early_factory.pipe.NetworkManagerProvider;
+import com.early_factory.pipe.PipeNetwork;
+import com.mojang.math.Vector3f;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -16,6 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -37,6 +46,9 @@ public class PipeBlock extends Block {
   private static final VoxelShape WEST_SHAPE = Block.box(0, 5, 5, 5, 11, 11);
   private static final VoxelShape UP_SHAPE = Block.box(5, 11, 5, 11, 16, 11);
   private static final VoxelShape DOWN_SHAPE = Block.box(5, 0, 5, 11, 5, 11);
+
+  private static final Vector3f INPUT_COLOR = new Vector3f(0.0F, 0.8F, 0.0F); // Green
+  private static final Vector3f OUTPUT_COLOR = new Vector3f(0.8F, 0.0F, 0.0F); // Red
 
   public PipeBlock(Properties properties) {
     super(properties);
@@ -138,5 +150,58 @@ public class PipeBlock extends Block {
   // You'll need to implement this method to access your NetworkManager instance
   private NetworkManager getNetworkManager(Level level) {
     return NetworkManagerProvider.get(level);
+  }
+
+  @Override
+  public InteractionResult use(BlockState state, Level level, BlockPos pos,
+      Player player, InteractionHand hand, BlockHitResult hit) {
+    if (!level.isClientSide && hand == InteractionHand.MAIN_HAND) {
+      Direction face = hit.getDirection();
+      BlockPos neighborPos = pos.relative(face);
+
+      // Check if the clicked side has an inventory
+      if (level.getBlockEntity(neighborPos) != null &&
+          level.getBlockEntity(neighborPos).getCapability(ForgeCapabilities.ITEM_HANDLER).isPresent()) {
+
+        // Toggle the inventory mode
+        NetworkManager networkManager = getNetworkManager(level);
+        PipeNetwork network = networkManager.findNetworkForPipe(pos);
+        if (network != null) {
+          String oldMode = network.getInventoryMode(pos, face);
+          network.toggleInventoryMode(pos, face);
+          String newMode = network.getInventoryMode(pos, face);
+
+          // Send feedback to player
+          player.displayClientMessage(
+              Component.literal("Inventory mode: " + newMode), true);
+
+          // Spawn particles at the connection point
+          spawnModeParticles((ServerLevel) level, pos, face, newMode);
+
+          return InteractionResult.SUCCESS;
+        }
+      }
+    }
+    return InteractionResult.PASS;
+  }
+
+  private void spawnModeParticles(ServerLevel level, BlockPos pos, Direction face, String mode) {
+    // Calculate particle position at the connection point
+    double x = pos.getX() + 0.5 + face.getStepX() * 0.5;
+    double y = pos.getY() + 0.5 + face.getStepY() * 0.5;
+    double z = pos.getZ() + 0.5 + face.getStepZ() * 0.5;
+
+    Vector3f color = switch (mode) {
+      case "INPUT" -> INPUT_COLOR;
+      case "OUTPUT" -> OUTPUT_COLOR;
+      default -> null;
+    };
+
+    if (color != null) {
+      level.sendParticles(new DustParticleOptions(color, 1.0F),
+          x, y, z, 8, // count
+          0.1, 0.1, 0.1, // spread
+          0.0); // speed
+    }
   }
 }

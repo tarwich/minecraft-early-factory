@@ -10,10 +10,12 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 public class PipeNetwork {
   private final Set<BlockPos> pipes = new HashSet<>();
@@ -22,6 +24,9 @@ public class PipeNetwork {
   // Map of inventory position to the set of pipes that connect to it
   private final Map<BlockPos, Set<BlockPos>> inventoryConnections = new HashMap<>();
   private final Level level;
+  // Add these fields to track input/output status
+  private final Set<BlockPos> inputInventories = new HashSet<>();
+  private final Set<BlockPos> outputInventories = new HashSet<>();
 
   public PipeNetwork(Level level, Set<BlockPos> pipesToAdd) {
     this.level = level;
@@ -132,8 +137,36 @@ public class PipeNetwork {
   }
 
   public void tick() {
-    // Handle item movement through the network
-    // This will be implemented later
+    // Try to move items from each input inventory
+    for (BlockPos inputPos : inputInventories) {
+      IItemHandler inputHandler = connectedInventories.get(inputPos);
+      if (inputHandler == null)
+        continue;
+
+      // Try each slot in the input inventory
+      for (int slot = 0; slot < inputHandler.getSlots(); slot++) {
+        // Try to extract (simulate first)
+        ItemStack extracted = inputHandler.extractItem(slot, 1, true);
+        if (extracted.isEmpty())
+          continue;
+
+        // Try to find an output that can accept this item
+        for (BlockPos outputPos : outputInventories) {
+          IItemHandler outputHandler = connectedInventories.get(outputPos);
+          if (outputHandler == null)
+            continue;
+
+          // Try to insert the item (simulate first)
+          ItemStack remaining = ItemHandlerHelper.insertItem(outputHandler, extracted, true);
+          if (remaining.isEmpty()) {
+            // If simulation succeeded, do the actual transfer
+            extracted = inputHandler.extractItem(slot, 1, false);
+            ItemHandlerHelper.insertItem(outputHandler, extracted, false);
+            break; // Move to next slot after successful transfer
+          }
+        }
+      }
+    }
   }
 
   public Set<BlockPos> getPipes() {
@@ -159,5 +192,32 @@ public class PipeNetwork {
     for (BlockPos pos : newPipes) {
       addPipe(pos);
     }
+  }
+
+  // Add this method to toggle input/output status (called when player
+  // right-clicks a pipe)
+  public void toggleInventoryMode(BlockPos pipePos, Direction face) {
+    BlockPos inventoryPos = pipePos.relative(face);
+    if (connectedInventories.containsKey(inventoryPos)) {
+      if (inputInventories.remove(inventoryPos)) {
+        // Was input, now make it output
+        outputInventories.add(inventoryPos);
+      } else if (outputInventories.remove(inventoryPos)) {
+        // Was output, now make it neither
+      } else {
+        // Was neither, make it input
+        inputInventories.add(inventoryPos);
+      }
+    }
+  }
+
+  public String getInventoryMode(BlockPos pipePos, Direction face) {
+    BlockPos inventoryPos = pipePos.relative(face);
+    if (inputInventories.contains(inventoryPos)) {
+      return "INPUT";
+    } else if (outputInventories.contains(inventoryPos)) {
+      return "OUTPUT";
+    }
+    return "NONE";
   }
 }
